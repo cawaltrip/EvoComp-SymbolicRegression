@@ -29,9 +29,11 @@ class Node {
 public:
 	Node(size_t var_count, double const_min, 
 		 double const_max, Node *parent = nullptr);
-	~Node();
 
+	void EraseTrees();
 	void GenerateFullTree(size_t depth, size_t max_depth);
+	void GenerateTree(size_t depth, size_t max_depth);
+	
 	double EvaluateFitness();
 	std::pair<size_t, size_t> CountNodeTypes();
 	
@@ -58,4 +60,7 @@ private:
 		kConst,
 		kVar
 	};
+
+	/* Internal functions for generating trees */
+	
 };

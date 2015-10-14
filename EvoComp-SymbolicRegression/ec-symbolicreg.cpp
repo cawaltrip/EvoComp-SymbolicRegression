@@ -1,7 +1,7 @@
 /*
-* node.cpp
+* ec-symbolicreg.cpp
 * UIdaho CS-572: Evolutionary Computation
-* Node class - a node of a tree data structure
+* Driver class for the Symbolic Regression Genetic Program
 *
 * Copyright (C) 2015 Chris Waltrip <walt2178@vandals.uidaho.edu>
 *
@@ -20,43 +20,10 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with EC-SymbolicReg.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "node.h"
-#include <algorithm>
 
-Node::Node(size_t var_count, double const_min, 
-		   double const_max, Node *parent) {
-	var_count_ = var_count;
-	const_min_ = const_min;
-	const_max_ = const_max;
-	parent_ = parent;
-}
+#include "individual.h"
 
-void Node::EraseTrees() {
-	for (std::vector<Node*>::iterator it = children_.begin(); 
-		it != children_.end(); ++it) {
-		if (*it != nullptr) {
-			(*it)->EraseTrees();
-			delete (*it);
-		}
-	}
-	children_.clear();
-	parent_ = nullptr;
-}
+int main() {
 
-void Node::GenerateFullTree(size_t depth, size_t max_depth) {
-
-}
-
-void Node::GenerateTree(size_t depth, size_t max_depth) {
-
-}
-
-double Node::EvaluateFitness() {
-
-	return 0.0;
-}
-
-std::pair<size_t, size_t> CountNodeTypes() {
-	std::pair<size_t, size_t> holder = std::make_pair(-1, -1);
-	return holder;
+	return 0;
 }

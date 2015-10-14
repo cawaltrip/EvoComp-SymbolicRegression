@@ -30,9 +30,12 @@ Individual::Individual(size_t max_depth, size_t var_count,
 	GenerateFullTree();
 }
 
+
 Individual::~Individual() {
+	root_->EraseTrees();
 	delete root_;
 }
+
 
 void Individual::CalculateTreeSize() {
 	std::pair<size_t, size_t> node_counts;
@@ -49,6 +52,7 @@ void Individual::CalculateFitness(std::vector<double> input_values,
 void Individual::GenerateFullTree() {
 	root_->GenerateFullTree(0, max_depth_);
 }
+
 
 double Individual::GetFitness() {
 	return fitness_;
