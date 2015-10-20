@@ -1,8 +1,7 @@
 /*
-* individual.h
+* operator_types.h
 * UIdaho CS-572: Evolutionary Computation
-* Header for Individual class.  Defines a single potential solution to 
-* a symbolic regression problem.
+* Enumeration of potential operator types needed by Node and NodeData
 *
 * Copyright (C) 2015 Chris Waltrip <walt2178@vandals.uidaho.edu>
 *
@@ -22,28 +21,11 @@
 * along with EC-SymbolicReg.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
-
-#include <utility>
-#include <vector>
-#include "node.h"
-
-class Individual {
-public:
-	Individual(size_t depth_limit, size_t var_count, 
-			   double const_min, double const_max);
-	~Individual();
-
-	void CalculateTreeSize();
-	void CalculateFitness(std::vector<double> input_values, 
-						 std::vector<double> output_values);
-	void GenerateFullTree();
-
-	double GetFitness();
-	size_t GetTreeSize();
-private:
-	Node *root_;
-	double fitness_;
-	size_t terminal_count_; /* Should mirror root_->terminal_count_ */
-	size_t nonterminal_count_; /* Should mirror root_->nonterminal_count_ */
-	size_t depth_limit_; /* Should mirror root_->depth_limit_ */
+enum OpType {
+	kAdd,
+	kSub,
+	kMult,
+	kDiv,
+	kConst,
+	kVar
 };

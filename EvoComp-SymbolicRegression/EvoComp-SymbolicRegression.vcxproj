@@ -21,9 +21,10 @@
   <ItemGroup>
     <ClInclude Include="individual.h" />
     <ClInclude Include="node.h" />
+    <ClInclude Include="operator_types.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ec-symbolicreg.cpp" />
+    <ClCompile Include="ec_symbolicreg.cpp" />
     <ClCompile Include="individual.cpp" />
     <ClCompile Include="node.cpp" />
   </ItemGroup>

@@ -24,43 +24,27 @@
 
 #include <utility> /* std::pair */
 #include <vector>
+#include "operator_types.h"
 
 class Node {
 public:
-	Node(size_t var_count, double const_min, 
-		 double const_max, Node *parent = nullptr);
-
-	void EraseTrees();
-	void GenerateFullTree(size_t depth, size_t max_depth);
-	void GenerateTree(size_t depth, size_t max_depth);
-	
-	double EvaluateFitness();
-	std::pair<size_t, size_t> CountNodeTypes();
-	
+	void Copy(Node *to_copy);
+	void Erase();
 private:
 	/* Tree Structure */
 	Node *parent_;
 	std::vector<Node*> children_;
+	size_t terminal_count_;
+	size_t nonterminal_count_;
+	size_t depth_limit_;
 
-	/* Value storage */
-	double const_val_;
+	/* Node Data */
+	OpType op_;
 	size_t var_index_;
+	double const_val_;
 
-	/* Tree Generation Information */
+	/* Node Metadata */
 	size_t var_count_;
 	double const_min_;
 	double const_max_;
-
-	/* Operator Type */
-	enum OpType {
-		kAdd,
-		kSub,
-		kMult,
-		kDiv,
-		kConst,
-		kVar
-	};
-
-	/* Internal functions for generating trees */
-	
 };

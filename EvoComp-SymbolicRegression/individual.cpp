@@ -25,21 +25,21 @@
 
 Individual::Individual(size_t max_depth, size_t var_count,
 					   double const_min, double const_max) {
-	max_depth_ = max_depth;
-	root_ = new Node(var_count, const_min, const_max, nullptr);
+	depth_limit_ = max_depth;
+	//root_ = new Node(var_count, const_min, const_max, nullptr);
 	GenerateFullTree();
 }
 
 
 Individual::~Individual() {
-	root_->EraseTrees();
+	root_->Erase();
 	delete root_;
 }
 
 
 void Individual::CalculateTreeSize() {
 	std::pair<size_t, size_t> node_counts;
-	node_counts = root_->CountNodeTypes();
+	//node_counts = root_->CountNodeTypes();
 	terminal_count_ = node_counts.first;
 	nonterminal_count_ = node_counts.second;
 }
@@ -50,7 +50,7 @@ void Individual::CalculateFitness(std::vector<double> input_values,
 }
 
 void Individual::GenerateFullTree() {
-	root_->GenerateFullTree(0, max_depth_);
+	//root_->GenerateFullTree(0, max_depth_);
 }
 
 

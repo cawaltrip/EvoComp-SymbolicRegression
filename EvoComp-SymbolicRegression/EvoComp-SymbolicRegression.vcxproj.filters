@@ -21,6 +21,9 @@
     <ClInclude Include="individual.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="operator_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="node.cpp">
@@ -29,7 +32,7 @@
     <ClCompile Include="individual.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ec-symbolicreg.cpp">
+    <ClCompile Include="ec_symbolicreg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

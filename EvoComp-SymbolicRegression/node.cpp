@@ -21,42 +21,35 @@
 * along with EC-SymbolicReg.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "node.h"
-#include <algorithm>
 
-Node::Node(size_t var_count, double const_min, 
-		   double const_max, Node *parent) {
-	var_count_ = var_count;
-	const_min_ = const_min;
-	const_max_ = const_max;
-	parent_ = parent;
-}
+void Node::Copy(Node *to_copy) {
+	terminal_count_ = to_copy->terminal_count_;
+	nonterminal_count_ = to_copy->nonterminal_count_;
+	depth_limit_ = to_copy->depth_limit_;
+	op_ = to_copy->op_;
+	var_count_ = to_copy->var_count_;
+	const_min_ = to_copy->const_min_;
+	const_max_ = to_copy->const_max_;
 
-void Node::EraseTrees() {
-	for (std::vector<Node*>::iterator it = children_.begin(); 
-		it != children_.end(); ++it) {
-		if (*it != nullptr) {
-			(*it)->EraseTrees();
-			delete (*it);
+	if (op_ == kConst) {
+		const_val_ = to_copy->const_val_;
+	} else if (op_ == kVar) {
+		var_index_ = to_copy->var_index_;
+	} else {
+		/* We must not be a leaf node, so copy children too */
+		for (size_t i = 0; i < to_copy->children_.size(); ++i) {
+			if (to_copy->children_[i] != nullptr) {
+				children_[i] = new Node();
+				children_[i]->Copy(to_copy->children_[i]);
+				children_[i]->parent_ = this;
+			}
 		}
 	}
-	children_.clear();
-	parent_ = nullptr;
 }
-
-void Node::GenerateFullTree(size_t depth, size_t max_depth) {
-
-}
-
-void Node::GenerateTree(size_t depth, size_t max_depth) {
-
-}
-
-double Node::EvaluateFitness() {
-
-	return 0.0;
-}
-
-std::pair<size_t, size_t> CountNodeTypes() {
-	std::pair<size_t, size_t> holder = std::make_pair(-1, -1);
-	return holder;
+void Node::Erase() {
+	for (auto &child : children_) {
+		child->parent_ = nullptr;
+		child->Erase();
+	}
+	delete this;
 }
