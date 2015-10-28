@@ -26,6 +26,9 @@
 #include <utility>
 #include <vector>
 #include "node.h"
+#include "solution_data.h"
+
+const size_t kMaxDepth = 6;
 
 class Individual {
 public:
@@ -34,16 +37,16 @@ public:
 	~Individual();
 
 	void CalculateTreeSize();
-	void CalculateFitness(std::vector<double> input_values, 
-						 std::vector<double> output_values);
+	void CalculateFitness(std::vector<SolutionData> input_values);
 	void GenerateFullTree();
 
 	double GetFitness();
 	size_t GetTreeSize();
+	void PrintTree();
 private:
 	Node *root_;
 	double fitness_;
-	size_t terminal_count_; /* Should mirror root_->terminal_count_ */
-	size_t nonterminal_count_; /* Should mirror root_->nonterminal_count_ */
-	size_t depth_limit_; /* Should mirror root_->depth_limit_ */
+	size_t terminal_count_;
+	size_t nonterminal_count_;
+	size_t depth_limit_;
 };

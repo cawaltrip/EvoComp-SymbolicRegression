@@ -22,11 +22,17 @@
     <ClInclude Include="individual.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="operator_types.h" />
+    <ClInclude Include="solution_data.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ec_symbolicreg.cpp" />
     <ClCompile Include="individual.cpp" />
     <ClCompile Include="node.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GPProjectData.csv">
+      <FileType>Text</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EC1BDCB5-7C51-40A1-9650-6D0B5BCABE6C}</ProjectGuid>

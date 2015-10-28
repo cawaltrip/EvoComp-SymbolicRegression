@@ -30,13 +30,17 @@ class Node {
 public:
 	void Copy(Node *to_copy);
 	void Erase();
+	void GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent);
+	double Evaluate(std::vector<double> var_values);
+	void Print(size_t cur_depth = 0);
+	void SetParent(Node *parent);
+	void SetVarCount(size_t var_count);
+	void SetConstMin(double const_min);
+	void SetConstMax(double const_max);
 private:
 	/* Tree Structure */
 	Node *parent_;
 	std::vector<Node*> children_;
-	size_t terminal_count_;
-	size_t nonterminal_count_;
-	size_t depth_limit_;
 
 	/* Node Data */
 	OpType op_;

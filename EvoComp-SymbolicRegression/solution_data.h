@@ -1,7 +1,7 @@
 /*
-* operator_types.h
+* solution_data.h
 * UIdaho CS-572: Evolutionary Computation
-* Enumeration of potential operator types needed by Node and NodeData
+* Structure representing a line of input data
 *
 * Copyright (C) 2015 Chris Waltrip <walt2178@vandals.uidaho.edu>
 *
@@ -21,11 +21,11 @@
 * along with EC-SymbolicReg.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
-enum OpType {
-	kAdd = 1,
-	kSub = 2,
-	kMult = 3,
-	kDiv = 4,
-	kConst = 5,
-	kVar = 6
+
+#include <vector>
+
+/* x is a vector that represents x_1,..,x_n and y is the fitness */
+struct SolutionData {
+	std::vector<double> x;
+	double y;
 };
