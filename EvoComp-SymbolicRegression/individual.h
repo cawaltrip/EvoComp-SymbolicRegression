@@ -38,8 +38,7 @@ public:
 
 	void CalculateTreeSize();
 	void CalculateFitness(std::vector<SolutionData> input_values);
-	void GenerateFullTree();
-	void GenerateSparseTree();
+	void GenerateTree(bool full_tree);
 
 	double GetFitness();
 	size_t GetTreeSize();

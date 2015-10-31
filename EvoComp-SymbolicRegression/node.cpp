@@ -53,26 +53,35 @@ void Node::Erase() {
 	}
 	delete this;
 }
-void Node::GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent) {
+void Node::GenerateTree(size_t cur_depth, size_t max_depth, 
+	Node *parent, bool full_tree) {
+	
 	std::random_device rd;
 	std::mt19937 mt(rd());
+
+	OpType lower_bound;
+	OpType upper_bound;
 
 	parent_ = parent;
 
 	if (cur_depth >= max_depth) {
-		std::uniform_int_distribution<int> d{ 5,6 }; /* Fix hard code */
+		lower_bound = kConst;
+		upper_bound = kVar;
+		std::uniform_int_distribution<int> d{ lower_bound,upper_bound };
 		op_ = static_cast<OpType>(d(mt));
 		if (op_ == kConst) {
-			std::uniform_real_distribution<double> v{ const_min_,const_max_ };
-			const_val_ = v(mt);
+			const_val_ = GenerateConstantValue();
+		} else {
+			var_index_ = GenerateVariableIndex();
 		}
-		else {
-			std::uniform_int_distribution<size_t> v{ 0,var_count_ };
-			var_index_ = v(mt);
+	} else {
+		lower_bound = kAdd;
+		if (full_tree) {
+			upper_bound = kDiv;
+		} else {
+			upper_bound = kVar;
 		}
-	}
-	else {
-		std::uniform_int_distribution<int> d{ 1,4 };
+		std::uniform_int_distribution<int> d{ lower_bound,upper_bound };
 		op_ = static_cast<OpType>(d(mt));
 		switch (op_) {
 		case kAdd:
@@ -84,9 +93,16 @@ void Node::GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent) {
 				newnode->var_count_ = this->var_count_;
 				newnode->const_min_ = this->const_min_;
 				newnode->const_max_ = this->const_max_;
-				newnode->GenerateFullTree(cur_depth + 1, max_depth, this);
+				newnode->GenerateTree(cur_depth + 1, max_depth, 
+					this, full_tree);
 				children_.push_back(newnode);
 			}
+			break;
+		case kConst:
+			const_val_ = GenerateConstantValue();
+			break;
+		case kVar:
+			var_index_ = GenerateVariableIndex();
 			break;
 		default:
 			/* Shouldn't get here */
@@ -94,11 +110,6 @@ void Node::GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent) {
 			break;
 		}
 	}
-}
-void Node::GenerateSparseTree(size_t cur_depth, size_t max_depth, 
-	Node *parent) {
-	/*TODO (Chris): Actually create a sparse tree */
-	this->GenerateFullTree(cur_depth, max_depth, parent);
 }
 void Node::Print() {
 	/* TODO (Chris W): Handle this after verifying tree creation works */
@@ -176,4 +187,27 @@ void Node::SetConstMin(double const_min) {
 }
 void Node::SetConstMax(double const_max) {
 	const_max_ = const_max;
+}
+bool Node::IsTerminal() {
+	if (op_ == kConst || op_ == kVar) {
+		return true;
+	}
+	return false;
+}
+bool Node::IsNonTerminal() {
+	return !IsTerminal();
+}
+double Node::GenerateConstantValue() {
+	std::random_device rd;
+	std::mt19937 mt(rd());
+
+	std::uniform_real_distribution<double> v{ const_min_,const_max_ };
+	return v(mt);
+}
+size_t Node::GenerateVariableIndex() {
+	std::random_device rd;
+	std::mt19937 mt(rd());
+
+	std::uniform_int_distribution<size_t> v{ 0,var_count_ };
+	return v(mt);
 }

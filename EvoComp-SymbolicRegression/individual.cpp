@@ -31,11 +31,7 @@ Individual::Individual(size_t depth_max, size_t var_count,
 	root_->SetConstMin(const_min);
 	root_->SetConstMax(const_max);
 
-	if (full_tree) {
-		GenerateFullTree();
-	} else {
-		GenerateSparseTree();
-	}
+	GenerateTree(full_tree);
 }
 void Individual::Erase() {
 	root_->Erase();
@@ -53,11 +49,8 @@ void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
 	}
 	fitness_ += sqrt(fitness_);
 }
-void Individual::GenerateFullTree() {
-	root_->GenerateFullTree(0, depth_max_, nullptr);
-}
-void Individual::GenerateSparseTree() {
-	root_->GenerateSparseTree(0, depth_max_, nullptr);
+void Individual::GenerateTree(bool full_tree) {
+	root_->GenerateTree(0, depth_max_, nullptr, full_tree);
 }
 double Individual::GetFitness() {
 	return fitness_;

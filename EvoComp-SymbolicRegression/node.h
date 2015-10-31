@@ -30,8 +30,8 @@ class Node {
 public:
 	void Copy(Node *to_copy);
 	void Erase();
-	void GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent);
-	void GenerateSparseTree(size_t cur_depth, size_t max_depth, Node *parent);
+	void GenerateTree(size_t cur_depth, size_t max_depth,
+		Node *parent, bool full_tree);
 	double Evaluate(std::vector<double> var_values);
 	void Print();
 	void CountNodes(size_t &term, size_t &nonterm);
@@ -40,6 +40,12 @@ public:
 	void SetConstMin(double const_min);
 	void SetConstMax(double const_max);
 private:
+	/* Helper Functions */
+	bool IsTerminal();
+	bool IsNonTerminal();
+	double GenerateConstantValue();
+	size_t GenerateVariableIndex();
+
 	/* Tree Structure */
 	Node *parent_;
 	std::vector<Node*> children_;
