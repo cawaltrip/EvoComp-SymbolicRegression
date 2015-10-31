@@ -23,15 +23,19 @@
 */
 #include "individual.h"
 
-Individual::Individual(size_t max_depth, size_t var_count,
-					   double const_min, double const_max) {
-	depth_limit_ = max_depth;
+Individual::Individual(size_t depth_max, size_t var_count,
+					   double const_min, double const_max, bool full_tree) {
+	depth_max_ = depth_max;
 	root_ = new Node;
 	root_->SetVarCount(var_count);
 	root_->SetConstMin(const_min);
 	root_->SetConstMax(const_max);
 
-	GenerateFullTree();
+	if (full_tree) {
+		GenerateFullTree();
+	} else {
+		GenerateSparseTree();
+	}
 }
 void Individual::Erase() {
 	root_->Erase();
@@ -50,7 +54,10 @@ void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
 	fitness_ += sqrt(fitness_);
 }
 void Individual::GenerateFullTree() {
-	root_->GenerateFullTree(0, depth_limit_, nullptr);
+	root_->GenerateFullTree(0, depth_max_, nullptr);
+}
+void Individual::GenerateSparseTree() {
+	root_->GenerateSparseTree(0, depth_max_, nullptr);
 }
 double Individual::GetFitness() {
 	return fitness_;

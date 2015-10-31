@@ -95,6 +95,11 @@ void Node::GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent) {
 		}
 	}
 }
+void Node::GenerateSparseTree(size_t cur_depth, size_t max_depth, 
+	Node *parent) {
+	/*TODO (Chris): Actually create a sparse tree */
+	this->GenerateFullTree(cur_depth, max_depth, parent);
+}
 void Node::Print() {
 	/* TODO (Chris W): Handle this after verifying tree creation works */
 }

@@ -33,14 +33,17 @@
 std::vector<SolutionData> ParseInput(std::string filename);
 
 int main() {
-	const size_t kTreeDepthMax = 3;
+	const size_t kPopulationSize = 100;
+
+	const size_t kTreeDepthMin = 3;
+	const size_t kTreeDepthMax = 6;
 	const double kConstMin = -10.0f;
 	const double kConstMax = 10.0f;
-	const size_t kPopulationSize = 100;
+	
 	std::vector<SolutionData> solutions(ParseInput("GPProjectData.csv"));
 	size_t var_count = solutions[0].x.size() - 1;
-	Population p(kPopulationSize, solutions, kTreeDepthMax, var_count, 
-		kConstMin, kConstMax);
+	Population p(kPopulationSize, kTreeDepthMin, kTreeDepthMax, 
+		kConstMin, kConstMax, var_count, solutions);
 
 	p.CalculateTreeSize();
 	p.CalculateFitness();

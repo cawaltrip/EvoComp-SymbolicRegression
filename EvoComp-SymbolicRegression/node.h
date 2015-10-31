@@ -31,6 +31,7 @@ public:
 	void Copy(Node *to_copy);
 	void Erase();
 	void GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent);
+	void GenerateSparseTree(size_t cur_depth, size_t max_depth, Node *parent);
 	double Evaluate(std::vector<double> var_values);
 	void Print();
 	void CountNodes(size_t &term, size_t &nonterm);

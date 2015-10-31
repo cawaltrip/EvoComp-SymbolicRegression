@@ -25,15 +25,16 @@
 #include <iostream> /* For debugging/logging only */
 
 Population::Population(size_t population_size,
-	std::vector<SolutionData> solutions, size_t depth_limit,
-	size_t var_count, double const_min, double const_max) {
-	
-	//population_size_ = population_size;
+	size_t depth_min, size_t depth_max,
+	double const_min, double const_max, size_t var_count,
+	std::vector<SolutionData> solutions) {
+
 	solutions_ = solutions;
-	depth_limit_ = depth_limit;
+
 	var_count_ = var_count;
 	const_min_ = const_min;
 	const_max_ = const_max;
+
 	best_fitness_ = DBL_MAX;
 	worst_fitness_ = DBL_MIN;
 	avg_fitness_ = 0;
@@ -43,10 +44,21 @@ Population::Population(size_t population_size,
 	avg_tree_ = 0;
 
 	/* Generate the population */
+	if (depth_min > depth_max) {
+		size_t temp = depth_max;
+		depth_max = depth_min;
+		depth_min = temp;
+	}
+	RampedHalfAndHalf(population_size, depth_min, depth_max);
+}
+void Population::RampedHalfAndHalf(size_t population_size, 
+	size_t depth_min, size_t depth_max) {
+	unsigned gradations = depth_max - depth_min + 1;
+
 	pop_.reserve(population_size);
 	for (size_t i = 0; i < population_size; ++i) {
-		pop_.push_back(Individual(depth_limit_, var_count_,
-			const_min_, const_max_));
+		pop_.push_back(Individual((depth_min + i % gradations) , var_count_, 
+			const_min_, const_max_, static_cast<bool>(i%2)));
 	}
 }
 void Population::CalculateFitness() {
@@ -58,8 +70,7 @@ void Population::CalculateFitness() {
 		avg_fitness_ += cur_fitness;
 		if (cur_fitness < best_fitness_) {
 			best_fitness_ = cur_fitness;
-		}
-		else if (cur_fitness > worst_fitness_) {
+		} else if (cur_fitness > worst_fitness_) {
 			worst_fitness_ = cur_fitness;
 		}
 		std::clog << "Current Fitness: " << cur_fitness << "\n";
@@ -75,8 +86,7 @@ void Population::CalculateTreeSize() {
 		avg_tree_ += cur_tree;
 		if (cur_tree > largest_tree_) {
 			largest_tree_ = cur_tree;
-		}
-		else if (cur_tree < smallest_tree_) {
+		} else if (cur_tree < smallest_tree_) {
 			smallest_tree_ = cur_tree;
 		}
 	}

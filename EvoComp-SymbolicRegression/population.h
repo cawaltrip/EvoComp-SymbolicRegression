@@ -27,9 +27,10 @@
 
 class Population {
 public:
-	Population(size_t population_size, std::vector<SolutionData> solutions, 
-		size_t depth_limit, size_t var_count, 
-		double const_min, double const_max);
+	Population(size_t population_size, size_t depth_min, size_t depth_max, 
+		double const_min, double const_max, size_t var_count, 
+		std::vector<SolutionData> solutions);
+
 	void CalculateFitness();
 	void CalculateTreeSize();
 	
@@ -41,12 +42,15 @@ public:
 	double GetWorstFitness();
 	double GetAverageFitness();
 private:
-	size_t population_size_;
+	void RampedHalfAndHalf(size_t population_size, 
+		size_t depth_min, size_t depth_max);
+
 	std::vector<SolutionData> solutions_;
-	size_t depth_limit_;
-	size_t var_count_;
+	//size_t depth_min_;
+	//size_t depth_max_;
 	double const_min_;
 	double const_max_;
+	size_t var_count_;
 	std::vector<Individual> pop_;
 
 	/* Population Metadata */
