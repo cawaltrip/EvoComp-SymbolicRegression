@@ -105,6 +105,36 @@ void Node::GenerateTree(size_t cur_depth, size_t max_depth,
 		break;
 	}
 }
+void Node::Mutate(double mutation_chance) {
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_real_distribution<double> mut_dist{ 0,1 };
+	if (mut_dist(mt) <= mutation_chance) {
+		OpType lower_bound, upper_bound;
+		if (IsTerminal()) {
+			lower_bound = kConst;
+			upper_bound = kVar;
+		} else {
+			lower_bound = kAdd;
+			upper_bound = kDiv;
+		}
+		std::uniform_int_distribution<int> d{ lower_bound, upper_bound };
+		op_ = static_cast<OpType>(d(mt));
+		switch (op_) {
+		case kConst:
+			const_val_ = GenerateConstantValue(); /* Completely new constant */
+			break;
+		case kVar:
+			var_index_ = GenerateVariableIndex();
+			break;
+		}
+	}
+	for (auto c : children_) {
+		if (c != nullptr) {
+			c->Mutate(mutation_chance);
+		}
+	}
+}
 void Node::Print() {
 	/* TODO (Chris W): Handle this after verifying tree creation works */
 }

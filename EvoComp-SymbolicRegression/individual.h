@@ -36,6 +36,8 @@ public:
 		double const_min, double const_max, bool full_tree);
 	void Erase();
 
+	void Mutate(double mutation_rate);
+
 	void CalculateTreeSize();
 	void CalculateFitness(std::vector<SolutionData> input_values);
 	void GenerateTree(bool full_tree);

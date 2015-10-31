@@ -33,6 +33,7 @@ public:
 	void GenerateTree(size_t cur_depth, size_t max_depth,
 		Node *parent, bool full_tree);
 	double Evaluate(std::vector<double> var_values);
+	void Mutate(double mutation_chance);
 	void Print();
 	void CountNodes(size_t &term, size_t &nonterm);
 	void SetParent(Node *parent);

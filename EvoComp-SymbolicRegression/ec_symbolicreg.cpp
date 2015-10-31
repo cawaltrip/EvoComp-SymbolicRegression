@@ -34,6 +34,8 @@ std::vector<SolutionData> ParseInput(std::string filename);
 
 int main() {
 	const size_t kPopulationSize = 100;
+	const double kMutationRate = 0.03;
+	const size_t kTournamentSize = 3;
 
 	const size_t kTreeDepthMin = 3;
 	const size_t kTreeDepthMax = 6;
@@ -42,8 +44,9 @@ int main() {
 	
 	std::vector<SolutionData> solutions(ParseInput("GPProjectData.csv"));
 	size_t var_count = solutions[0].x.size() - 1;
-	Population p(kPopulationSize, kTreeDepthMin, kTreeDepthMax, 
-		kConstMin, kConstMax, var_count, solutions);
+	Population p(kPopulationSize, kMutationRate, kTournamentSize, 
+		kTreeDepthMin, kTreeDepthMax, kConstMin, kConstMax, 
+		var_count, solutions);
 
 	p.CalculateTreeSize();
 	p.CalculateFitness();
@@ -53,10 +56,22 @@ int main() {
 	std::clog << "Worst: " << p.GetWorstFitness() << std::endl;
 	std::clog << "Average: " << p.GetAverageFitness() << std::endl;
 	std::clog << std::endl;
+
+	p.MutatePopulation();
+	p.CalculateFitness();
+
+	std::clog << "Fitness: " << std::endl;
+	std::clog << "Best: " << p.GetBestFitness() << std::endl;
+	std::clog << "Worst: " << p.GetWorstFitness() << std::endl;
+	std::clog << "Average: " << p.GetAverageFitness() << std::endl;
+	std::clog << std::endl;
+
+
 	std::clog << "Tree Size: " << std::endl;
 	std::clog << "Largest: " << p.GetLargestTreeSize() << std::endl;
 	std::clog << "Smallest: " << p.GetSmallestTreeSize() << std::endl;
 	std::clog << "Average: " << p.GetAverageTreeSize() << std::endl;
+	std::clog << "Total Node Count: " << p.GetTotalNodeCount() << std::endl;
 
 	return 0;
 }

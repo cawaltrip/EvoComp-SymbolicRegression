@@ -37,6 +37,9 @@ void Individual::Erase() {
 	root_->Erase();
 	delete root_;
 }
+void Individual::Mutate(double mutation_rate) {
+	root_->Mutate(mutation_rate);
+}
 void Individual::CalculateTreeSize() {
 	terminal_count_ = 0;
 	nonterminal_count_ = 0;
@@ -47,7 +50,7 @@ void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
 	for (size_t i = 0; i < solutions.size(); ++i) {
 		fitness_ += pow(solutions[i].y - root_->Evaluate(solutions[i].x),2);
 	}
-	fitness_ += sqrt(fitness_);
+	fitness_ = sqrt(fitness_ / solutions.size());
 }
 void Individual::GenerateTree(bool full_tree) {
 	root_->GenerateTree(0, depth_max_, nullptr, full_tree);

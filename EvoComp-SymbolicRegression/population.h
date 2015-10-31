@@ -27,9 +27,12 @@
 
 class Population {
 public:
-	Population(size_t population_size, size_t depth_min, size_t depth_max, 
+	Population(size_t population_size, double mutation_rate, 
+		size_t tournament_size, size_t depth_min, size_t depth_max, 
 		double const_min, double const_max, size_t var_count, 
 		std::vector<SolutionData> solutions);
+
+	void MutatePopulation();
 
 	void CalculateFitness();
 	void CalculateTreeSize();
@@ -37,27 +40,30 @@ public:
 	size_t GetLargestTreeSize();
 	size_t GetSmallestTreeSize();
 	size_t GetAverageTreeSize();
+	size_t GetTotalNodeCount();
 
 	double GetBestFitness();
 	double GetWorstFitness();
 	double GetAverageFitness();
 private:
+	/* Helper functions */
 	void RampedHalfAndHalf(size_t population_size, 
 		size_t depth_min, size_t depth_max);
 
+	/* Population Data */
+	std::vector<Individual> pop_;
 	std::vector<SolutionData> solutions_;
-	//size_t depth_min_;
-	//size_t depth_max_;
 	double const_min_;
 	double const_max_;
 	size_t var_count_;
-	std::vector<Individual> pop_;
+	double mutation_rate_;
+	size_t tournament_size_;
 
 	/* Population Metadata */
 	size_t largest_tree_;
 	size_t smallest_tree_;
 	size_t avg_tree_;
-
+	size_t total_nodes_;
 	double best_fitness_;
 	double worst_fitness_;
 	double avg_fitness_;

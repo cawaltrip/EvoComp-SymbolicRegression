@@ -24,12 +24,15 @@
 #include "population.h"
 #include <iostream> /* For debugging/logging only */
 
-Population::Population(size_t population_size,
-	size_t depth_min, size_t depth_max,
+Population::Population(size_t population_size, double mutation_rate,
+	size_t tournament_size, size_t depth_min, size_t depth_max,
 	double const_min, double const_max, size_t var_count,
 	std::vector<SolutionData> solutions) {
 
 	solutions_ = solutions;
+
+	mutation_rate_ = mutation_rate;
+	tournament_size_ = tournament_size;
 
 	var_count_ = var_count;
 	const_min_ = const_min;
@@ -53,12 +56,17 @@ Population::Population(size_t population_size,
 }
 void Population::RampedHalfAndHalf(size_t population_size, 
 	size_t depth_min, size_t depth_max) {
-	unsigned gradations = depth_max - depth_min + 1;
+	unsigned gradations = static_cast<unsigned>(depth_max - depth_min + 1);
 
 	pop_.reserve(population_size);
 	for (size_t i = 0; i < population_size; ++i) {
 		pop_.push_back(Individual((depth_min + i % gradations) , var_count_, 
 			const_min_, const_max_, static_cast<bool>(i%2)));
+	}
+}
+void Population::MutatePopulation() {
+	for (auto p : pop_) {
+		p.Mutate(mutation_rate_);
 	}
 }
 void Population::CalculateFitness() {
@@ -73,7 +81,7 @@ void Population::CalculateFitness() {
 		} else if (cur_fitness > worst_fitness_) {
 			worst_fitness_ = cur_fitness;
 		}
-		std::clog << "Current Fitness: " << cur_fitness << "\n";
+		//std::clog << "Current Fitness: " << cur_fitness << "\n";
 	}
 	avg_fitness_ = avg_fitness_ / pop_.size();
 }
@@ -90,9 +98,9 @@ void Population::CalculateTreeSize() {
 			smallest_tree_ = cur_tree;
 		}
 	}
+	total_nodes_ = avg_tree_;
 	avg_tree_ = avg_tree_ / pop_.size(); /* Will truncate, I don't care */
 }
-
 size_t Population::GetLargestTreeSize() {
 	return largest_tree_;
 }
@@ -102,7 +110,9 @@ size_t Population::GetSmallestTreeSize() {
 size_t Population::GetAverageTreeSize() {
 	return avg_tree_;
 }
-
+size_t Population::GetTotalNodeCount() {
+	return total_nodes_;
+}
 double Population::GetBestFitness() {
 	return best_fitness_;
 }
