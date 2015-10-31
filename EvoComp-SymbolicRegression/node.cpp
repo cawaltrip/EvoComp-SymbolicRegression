@@ -64,51 +64,45 @@ void Node::GenerateTree(size_t cur_depth, size_t max_depth,
 
 	parent_ = parent;
 
+	/* Determine bounds for node type */
+	if (full_tree) {
+		lower_bound = kAdd;
+		upper_bound = kDiv;
+	} else {
+		lower_bound = kAdd;
+		upper_bound = kVar;
+	}
 	if (cur_depth >= max_depth) {
 		lower_bound = kConst;
 		upper_bound = kVar;
-		std::uniform_int_distribution<int> d{ lower_bound,upper_bound };
-		op_ = static_cast<OpType>(d(mt));
-		if (op_ == kConst) {
-			const_val_ = GenerateConstantValue();
-		} else {
-			var_index_ = GenerateVariableIndex();
+	}
+	std::uniform_int_distribution<int> d{ lower_bound,upper_bound };
+	op_ = static_cast<OpType>(d(mt));
+	switch (op_) {
+	case kAdd:
+	case kSub:
+	case kMult:
+	case kDiv:
+		for (size_t i = 0; i < 2; ++i) {
+			Node *newnode = new Node;
+			newnode->var_count_ = this->var_count_;
+			newnode->const_min_ = this->const_min_;
+			newnode->const_max_ = this->const_max_;
+			newnode->GenerateTree(cur_depth + 1, max_depth, 
+				this, full_tree);
+			children_.push_back(newnode);
 		}
-	} else {
-		lower_bound = kAdd;
-		if (full_tree) {
-			upper_bound = kDiv;
-		} else {
-			upper_bound = kVar;
-		}
-		std::uniform_int_distribution<int> d{ lower_bound,upper_bound };
-		op_ = static_cast<OpType>(d(mt));
-		switch (op_) {
-		case kAdd:
-		case kSub:
-		case kMult:
-		case kDiv:
-			for (size_t i = 0; i < 2; ++i) {
-				Node *newnode = new Node;
-				newnode->var_count_ = this->var_count_;
-				newnode->const_min_ = this->const_min_;
-				newnode->const_max_ = this->const_max_;
-				newnode->GenerateTree(cur_depth + 1, max_depth, 
-					this, full_tree);
-				children_.push_back(newnode);
-			}
-			break;
-		case kConst:
-			const_val_ = GenerateConstantValue();
-			break;
-		case kVar:
-			var_index_ = GenerateVariableIndex();
-			break;
-		default:
-			/* Shouldn't get here */
-			std::cerr << "Bad non-terminal type!" << std::endl;
-			break;
-		}
+		break;
+	case kConst:
+		const_val_ = GenerateConstantValue();
+		break;
+	case kVar:
+		var_index_ = GenerateVariableIndex();
+		break;
+	default:
+		/* Shouldn't get here */
+		std::cerr << "Bad node type!" << std::endl;
+		break;
 	}
 }
 void Node::Print() {
