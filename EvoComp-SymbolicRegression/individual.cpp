@@ -22,55 +22,45 @@
 * along with EC-SymbolicReg.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "individual.h"
-#include <iostream> /* For debug/logging only */
-
 
 Individual::Individual(size_t max_depth, size_t var_count,
 					   double const_min, double const_max) {
 	depth_limit_ = max_depth;
 	root_ = new Node;
-	//root_->SetParent(nullptr);
 	root_->SetVarCount(var_count);
 	root_->SetConstMin(const_min);
 	root_->SetConstMax(const_max);
 
 	GenerateFullTree();
 }
-
-
-Individual::~Individual() {
+void Individual::Erase() {
 	root_->Erase();
 	delete root_;
 }
-
-
 void Individual::CalculateTreeSize() {
-	//std::pair<size_t, size_t> node_counts;
-	//node_counts = root_->CountNodeTypes();
-	//terminal_count_ = node_counts.first;
-	//nonterminal_count_ = node_counts.second;
+	terminal_count_ = 0;
+	nonterminal_count_ = 0;
+	root_->CountNodes(terminal_count_, nonterminal_count_);
 }
-
-void Individual::CalculateFitness(std::vector<SolutionData> input_values) {
+void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
 	fitness_ = 0.0f;
-	std::vector<double> output_values(input_values[0].x.size());
-	for (size_t i = 0; i < input_values.size(); ++i) {
-		output_values[i] = root_->Evaluate(input_values[i].x);
+	for (size_t i = 0; i < solutions.size(); ++i) {
+		fitness_ += pow(solutions[i].y - root_->Evaluate(solutions[i].x),2);
 	}
-	for (auto x : output_values) {
-		std::clog << x << std::endl;
-	}
+	fitness_ += sqrt(fitness_);
 }
-
 void Individual::GenerateFullTree() {
 	root_->GenerateFullTree(0, depth_limit_, nullptr);
 }
-
-
 double Individual::GetFitness() {
 	return fitness_;
 }
-
 size_t Individual::GetTreeSize() {
-	return terminal_count_ + nonterminal_count_;
+	return this->GetTerminalCount() + this->GetNonTerminalCount();
+}
+size_t Individual::GetTerminalCount() {
+	return terminal_count_;
+}
+size_t Individual::GetNonTerminalCount() {
+	return nonterminal_count_;
 }

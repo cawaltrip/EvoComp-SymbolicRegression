@@ -32,7 +32,8 @@ public:
 	void Erase();
 	void GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent);
 	double Evaluate(std::vector<double> var_values);
-	void Print(size_t cur_depth = 0);
+	void Print();
+	void CountNodes(size_t &term, size_t &nonterm);
 	void SetParent(Node *parent);
 	void SetVarCount(size_t var_count);
 	void SetConstMin(double const_min);

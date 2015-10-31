@@ -22,12 +22,14 @@
     <ClInclude Include="individual.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="operator_types.h" />
+    <ClInclude Include="population.h" />
     <ClInclude Include="solution_data.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ec_symbolicreg.cpp" />
     <ClCompile Include="individual.cpp" />
     <ClCompile Include="node.cpp" />
+    <ClCompile Include="population.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GPProjectData.csv">
@@ -119,7 +121,7 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>

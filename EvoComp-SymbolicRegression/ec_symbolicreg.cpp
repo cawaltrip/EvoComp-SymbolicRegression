@@ -27,7 +27,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "individual.h"
+#include "population.h"
 #include "solution_data.h"
 
 std::vector<SolutionData> ParseInput(std::string filename);
@@ -36,13 +36,27 @@ int main() {
 	const size_t kTreeDepthMax = 3;
 	const double kConstMin = -10.0f;
 	const double kConstMax = 10.0f;
+	const size_t kPopulationSize = 100;
 	std::vector<SolutionData> solutions(ParseInput("GPProjectData.csv"));
-	Individual t(kTreeDepthMax, solutions[0].x.size(), kConstMin, kConstMax);
-	t.CalculateFitness(solutions);
+	size_t var_count = solutions[0].x.size() - 1;
+	Population p(kPopulationSize, solutions, kTreeDepthMax, var_count, 
+		kConstMin, kConstMax);
+
+	p.CalculateTreeSize();
+	p.CalculateFitness();
+
+	std::clog << "Fitness: " << std::endl;
+	std::clog << "Best: " << p.GetBestFitness() << std::endl;
+	std::clog << "Worst: " << p.GetWorstFitness() << std::endl;
+	std::clog << "Average: " << p.GetAverageFitness() << std::endl;
+	std::clog << std::endl;
+	std::clog << "Tree Size: " << std::endl;
+	std::clog << "Largest: " << p.GetLargestTreeSize() << std::endl;
+	std::clog << "Smallest: " << p.GetSmallestTreeSize() << std::endl;
+	std::clog << "Average: " << p.GetAverageTreeSize() << std::endl;
 
 	return 0;
 }
-
 std::vector<SolutionData> ParseInput(std::string filename) {
 	std::ifstream inf;
 	std::string line;
@@ -64,7 +78,7 @@ std::vector<SolutionData> ParseInput(std::string filename) {
 	while (std::getline(inf, tmp))
 		++lc;
 	inf.clear();
-	inf.seekg(0, std::ios::beg);
+	inf.seekg(0, std::ios::beg); /* Return to beginning of buffer */
 
 	/* Parse input file */
 	solutions.resize(lc - 1);

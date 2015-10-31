@@ -1,8 +1,7 @@
 /*
-* individual.h
+* population.h
 * UIdaho CS-572: Evolutionary Computation
-* Header for Individual class.  Defines a single potential solution to 
-* a symbolic regression problem.
+* Population class: Store a collection of individuals for processing.
 *
 * Copyright (C) 2015 Chris Waltrip <walt2178@vandals.uidaho.edu>
 *
@@ -23,33 +22,39 @@
 */
 #pragma once
 
-#include <utility>
 #include <vector>
-#include "node.h"
-#include "solution_data.h"
+#include "individual.h"
 
-const size_t kMaxDepth = 6;
-
-class Individual {
+class Population {
 public:
-	Individual(size_t depth_limit, size_t var_count, 
-			   double const_min, double const_max);
-	//~Individual();
-	void Erase();
-
+	Population(size_t population_size, std::vector<SolutionData> solutions, 
+		size_t depth_limit, size_t var_count, 
+		double const_min, double const_max);
+	void CalculateFitness();
 	void CalculateTreeSize();
-	void CalculateFitness(std::vector<SolutionData> input_values);
-	void GenerateFullTree();
+	
+	size_t GetLargestTreeSize();
+	size_t GetSmallestTreeSize();
+	size_t GetAverageTreeSize();
 
-	double GetFitness();
-	size_t GetTreeSize();
-	size_t GetTerminalCount();
-	size_t GetNonTerminalCount();
-	void PrintTree();
+	double GetBestFitness();
+	double GetWorstFitness();
+	double GetAverageFitness();
 private:
-	Node *root_;
-	double fitness_;
-	size_t terminal_count_;
-	size_t nonterminal_count_;
+	size_t population_size_;
+	std::vector<SolutionData> solutions_;
 	size_t depth_limit_;
+	size_t var_count_;
+	double const_min_;
+	double const_max_;
+	std::vector<Individual> pop_;
+
+	/* Population Metadata */
+	size_t largest_tree_;
+	size_t smallest_tree_;
+	size_t avg_tree_;
+
+	double best_fitness_;
+	double worst_fitness_;
+	double avg_fitness_;
 };

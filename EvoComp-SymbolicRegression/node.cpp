@@ -53,7 +53,6 @@ void Node::Erase() {
 	}
 	delete this;
 }
-
 void Node::GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent) {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -81,11 +80,12 @@ void Node::GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent) {
 		case kMult:
 		case kDiv:
 			for (size_t i = 0; i < 2; ++i) {
-				children_[i] = new Node;
-				children_[i]->var_count_ = this->var_count_;
-				children_[i]->const_min_ = this->const_min_;
-				children_[i]->const_max_ = this->const_max_;
-				children_[i]->GenerateFullTree(cur_depth + 1, max_depth, this);
+				Node *newnode = new Node;
+				newnode->var_count_ = this->var_count_;
+				newnode->const_min_ = this->const_min_;
+				newnode->const_max_ = this->const_max_;
+				newnode->GenerateFullTree(cur_depth + 1, max_depth, this);
+				children_.push_back(newnode);
 			}
 			break;
 		default:
@@ -95,11 +95,28 @@ void Node::GenerateFullTree(size_t cur_depth, size_t max_depth, Node *parent) {
 		}
 	}
 }
-
-void Node::Print(size_t cur_depth) {
+void Node::Print() {
 	/* TODO (Chris W): Handle this after verifying tree creation works */
 }
-
+void Node::CountNodes(size_t &term, size_t &nonterm) {
+	for (auto n : children_) {
+		if (n != nullptr) {
+			n->CountNodes(term, nonterm);
+		}
+	}
+	switch (op_) {
+	case kAdd:
+	case kSub:
+	case kMult:
+	case kDiv:
+		++nonterm;
+		break;
+	case kConst:
+	case kVar:
+		++term;
+		break;
+	}
+}
 double Node::Evaluate(std::vector<double> var_values) {
 	double left_child;
 	double right_child;
