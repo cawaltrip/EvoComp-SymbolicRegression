@@ -32,21 +32,22 @@ const size_t kMaxDepth = 6;
 
 class Individual {
 public:
-	Individual(size_t depth_max, size_t var_count, 
-		double const_min, double const_max, bool full_tree);
+	Individual();
+	Individual(size_t var_count, double const_min, double const_max);
+	Individual(size_t var_count, double const_min, double const_max,
+		size_t depth_max, bool full_tree);
 	void Erase();
-
+	std::string ToString();
 	void Mutate(double mutation_rate);
 
 	void CalculateTreeSize();
 	void CalculateFitness(std::vector<SolutionData> input_values);
-	void GenerateTree(bool full_tree);
+	void GenerateTree(size_t depth_max, bool full_tree);
 
 	double GetFitness();
 	size_t GetTreeSize();
 	size_t GetTerminalCount();
 	size_t GetNonTerminalCount();
-	void PrintTree();
 private:
 	Node *root_;
 	double fitness_;

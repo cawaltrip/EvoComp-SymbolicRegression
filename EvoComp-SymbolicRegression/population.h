@@ -32,10 +32,11 @@ public:
 		double const_min, double const_max, size_t var_count, 
 		std::vector<SolutionData> solutions);
 
-	void MutatePopulation();
+	void RunPrivateTestFunctions();
+	std::string BestTreeToString();
+	std::string AllTreesToString();
 
-	void CalculateFitness();
-	void CalculateTreeSize();
+	void Evolve(size_t evolution_count = 1, size_t elitism_count = 2);
 	
 	size_t GetLargestTreeSize();
 	size_t GetSmallestTreeSize();
@@ -49,6 +50,13 @@ private:
 	/* Helper functions */
 	void RampedHalfAndHalf(size_t population_size, 
 		size_t depth_min, size_t depth_max);
+	size_t SelectIndividual();
+	void MutatePopulation();
+	void Crossover(Individual *parent1, Individual *parent2);
+	std::vector<size_t> Elitism(size_t elite_count);
+	void CalculateFitness();
+	void CalculateTreeSize();
+	std::string ToString(size_t tree_index);
 
 	/* Population Data */
 	std::vector<Individual> pop_;

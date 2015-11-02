@@ -49,5 +49,8 @@
     <None Include="GPProjectData.csv">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="GPProjectEasyData.csv">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

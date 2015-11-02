@@ -34,7 +34,7 @@ public:
 		Node *parent, bool full_tree);
 	double Evaluate(std::vector<double> var_values);
 	void Mutate(double mutation_chance);
-	void Print();
+	std::string ToString();
 	void CountNodes(size_t &term, size_t &nonterm);
 	void SetParent(Node *parent);
 	void SetVarCount(size_t var_count);

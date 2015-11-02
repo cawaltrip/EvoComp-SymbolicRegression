@@ -23,15 +23,17 @@
 */
 #include "individual.h"
 
-Individual::Individual(size_t depth_max, size_t var_count,
-					   double const_min, double const_max, bool full_tree) {
-	depth_max_ = depth_max;
+Individual::Individual(size_t var_count, double const_min, double const_max) {
 	root_ = new Node;
 	root_->SetVarCount(var_count);
 	root_->SetConstMin(const_min);
 	root_->SetConstMax(const_max);
-
-	GenerateTree(full_tree);
+}
+Individual::Individual() : Individual(0, 0, 0) {}
+Individual::Individual(size_t var_count, double const_min, double const_max,
+	size_t depth_max, bool full_tree) 
+	: Individual(var_count, const_min, const_max) {
+	this->GenerateTree(depth_max, full_tree);
 }
 void Individual::Erase() {
 	root_->Erase();
@@ -50,10 +52,14 @@ void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
 	for (size_t i = 0; i < solutions.size(); ++i) {
 		fitness_ += pow(solutions[i].y - root_->Evaluate(solutions[i].x),2);
 	}
-	fitness_ = sqrt(fitness_ / solutions.size());
+	//fitness_ = sqrt(fitness_ / solutions.size());
+	fitness_ = sqrt(fitness_);
 }
-void Individual::GenerateTree(bool full_tree) {
-	root_->GenerateTree(0, depth_max_, nullptr, full_tree);
+void Individual::GenerateTree(size_t depth_max, bool full_tree) {
+	root_->GenerateTree(0, depth_max, nullptr, full_tree);
+}
+std::string Individual::ToString() {
+	return root_->ToString();
 }
 double Individual::GetFitness() {
 	return fitness_;

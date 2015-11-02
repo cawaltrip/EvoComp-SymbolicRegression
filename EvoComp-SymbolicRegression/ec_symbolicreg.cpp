@@ -20,7 +20,6 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with EC-SymbolicReg.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -31,48 +30,41 @@
 #include "solution_data.h"
 
 std::vector<SolutionData> ParseInput(std::string filename);
+void PrintPopulationFitnessSummary(Population p);
+void PrintPopulationTreeSizeSummary(Population p);
 
 int main() {
-	const size_t kPopulationSize = 100;
+	/* Genetic Program Constants */
+	const std::string kFilename = "GPProjectEasyData.csv";
+	const size_t kEvolutionCount = 1;
+	const size_t kElitismCount = 2;
+
+	/* Population Constants */
+	const size_t kPopulationSize = 30;
 	const double kMutationRate = 0.03;
 	const size_t kTournamentSize = 3;
 
+	/* Individual/Node Constants */
 	const size_t kTreeDepthMin = 3;
 	const size_t kTreeDepthMax = 6;
 	const double kConstMin = -10.0f;
 	const double kConstMax = 10.0f;
 	
-	std::vector<SolutionData> solutions(ParseInput("GPProjectData.csv"));
+	/* File Parsing */
+	std::vector<SolutionData> solutions(ParseInput(kFilename));
 	size_t var_count = solutions[0].x.size() - 1;
 	Population p(kPopulationSize, kMutationRate, kTournamentSize, 
 		kTreeDepthMin, kTreeDepthMax, kConstMin, kConstMax, 
 		var_count, solutions);
 
-	p.CalculateTreeSize();
-	p.CalculateFitness();
+	/* Genetic Program Work */
+	PrintPopulationFitnessSummary(p);
 
-	std::clog << "Fitness: " << std::endl;
-	std::clog << "Best: " << p.GetBestFitness() << std::endl;
-	std::clog << "Worst: " << p.GetWorstFitness() << std::endl;
-	std::clog << "Average: " << p.GetAverageFitness() << std::endl;
-	std::clog << std::endl;
-
-	p.MutatePopulation();
-	p.CalculateFitness();
-
-	std::clog << "Fitness: " << std::endl;
-	std::clog << "Best: " << p.GetBestFitness() << std::endl;
-	std::clog << "Worst: " << p.GetWorstFitness() << std::endl;
-	std::clog << "Average: " << p.GetAverageFitness() << std::endl;
-	std::clog << std::endl;
-
-
-	std::clog << "Tree Size: " << std::endl;
-	std::clog << "Largest: " << p.GetLargestTreeSize() << std::endl;
-	std::clog << "Smallest: " << p.GetSmallestTreeSize() << std::endl;
-	std::clog << "Average: " << p.GetAverageTreeSize() << std::endl;
-	std::clog << "Total Node Count: " << p.GetTotalNodeCount() << std::endl;
-
+	for (size_t i = 0; i < 20; i++) {
+		p.Evolve(kEvolutionCount, kElitismCount);
+		PrintPopulationFitnessSummary(p);
+	}
+	
 	return 0;
 }
 std::vector<SolutionData> ParseInput(std::string filename) {
@@ -118,4 +110,19 @@ std::vector<SolutionData> ParseInput(std::string filename) {
 	solutions.shrink_to_fit();
 	inf.close();
 	return solutions;
+}
+void PrintPopulationFitnessSummary(Population p) {
+	std::clog << "Fitness: " << std::endl;
+	std::clog << "Best: " << p.GetBestFitness() << std::endl;
+	std::clog << "Worst: " << p.GetWorstFitness() << std::endl;
+	std::clog << "Average: " << p.GetAverageFitness() << std::endl;
+	std::clog << "Best Solution: " << p.BestTreeToString() << std::endl;
+	std::clog << std::endl;
+}
+void PrintPopulationTreeSizeSummary(Population p) {
+	std::clog << "Tree Size: " << std::endl;
+	std::clog << "Largest: " << p.GetLargestTreeSize() << std::endl;
+	std::clog << "Smallest: " << p.GetSmallestTreeSize() << std::endl;
+	std::clog << "Average: " << p.GetAverageTreeSize() << std::endl;
+	std::clog << "Total Node Count: " << p.GetTotalNodeCount() << std::endl;
 }

@@ -23,6 +23,7 @@
 #include "node.h"
 #include <iostream> /* Only for errors */
 #include <random>
+#include <string> /* For std::to_string */
 #include "operator_types.h"
 
 void Node::Copy(Node *to_copy) {
@@ -135,8 +136,35 @@ void Node::Mutate(double mutation_chance) {
 		}
 	}
 }
-void Node::Print() {
+std::string Node::ToString() {
 	/* TODO (Chris W): Handle this after verifying tree creation works */
+	switch (op_) {
+	case kAdd:
+		return ("(" + children_[0]->ToString() + 
+				" + " + children_[1]->ToString() + ")");
+		break;
+	case kSub:
+		return ("(" + children_[0]->ToString() +
+			" - " + children_[1]->ToString() + ")");
+		break;
+	case kMult:
+		return ("(" + children_[0]->ToString() +
+			" * " + children_[1]->ToString() + ")");
+		break;
+	case kDiv:
+		return ("(" + children_[0]->ToString() +
+			" / " + children_[1]->ToString() + ")");
+		break;
+	case kConst:
+		return std::to_string(const_val_);
+		break;
+	case kVar:
+		return "X_" + std::to_string(var_index_);
+		break;
+	default:
+		return "ERROR REACHED";
+		break;
+	}
 }
 void Node::CountNodes(size_t &term, size_t &nonterm) {
 	for (auto n : children_) {
