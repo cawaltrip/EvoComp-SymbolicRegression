@@ -28,8 +28,6 @@
 #include "node.h"
 #include "solution_data.h"
 
-const size_t kMaxDepth = 6;
-
 class Individual {
 public:
 	Individual();
@@ -38,19 +36,22 @@ public:
 		size_t depth_max, bool full_tree);
 	void Erase();
 	std::string ToString();
+	
+	/* Genetic Program Functions */
+	void GenerateTree(size_t depth_max, bool full_tree);
 	void Mutate(double mutation_rate);
-
-	std::pair<Node*,size_t> GetRandomNode(bool nonterminal);
-
+	std::pair<Node*, size_t> GetRandomNode(bool nonterminal);
+	
+	/* Public Helper Functions */
 	void CalculateTreeSize();
 	void CalculateFitness(std::vector<SolutionData> input_values);
-	void GenerateTree(size_t depth_max, bool full_tree);
-	void SetRootNode(Node *root);
 
+	/* Private Accessors/Mutators */
 	double GetFitness();
 	size_t GetTreeSize();
 	size_t GetTerminalCount();
 	size_t GetNonTerminalCount();
+	void SetRootNode(Node *root);
 private:
 	Node *root_;
 	double fitness_;

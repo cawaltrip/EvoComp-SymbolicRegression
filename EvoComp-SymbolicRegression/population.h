@@ -31,33 +31,34 @@ public:
 		double nonterminal_crossover_rate, size_t tournament_size, 
 		size_t depth_min, size_t depth_max, double const_min, double const_max,
 		size_t var_count, std::vector<SolutionData> solutions);
-
-	void RunPrivateTestFunctions();
-	std::string BestTreeToString();
-	std::string AllTreesToString();
-
+	std::string ToString();
+	
+	/* Public Genetic Program Functions */
 	void Evolve(size_t evolution_count = 1, size_t elitism_count = 2);
 	
+	/* Private Accessor Functions */
 	size_t GetLargestTreeSize();
 	size_t GetSmallestTreeSize();
 	size_t GetAverageTreeSize();
 	size_t GetTotalNodeCount();
-
 	double GetBestFitness();
 	double GetWorstFitness();
 	double GetAverageFitness();
 private:
-	/* Helper functions */
-	void RampedHalfAndHalf(size_t population_size, 
-		size_t depth_min, size_t depth_max);
-	size_t SelectIndividual();
+	/* Private Genetic Program Functions */
+	void RampedHalfAndHalf(size_t population_size,
+						   size_t depth_min, size_t depth_max);
 	void MutatePopulation();
 	void Crossover(Individual *father, Individual *mother);
-	void Crossover(Node *father, Node *mother);
+
+	/* Helper functions */
+	size_t SelectIndividual();
 	std::vector<size_t> Elitism(size_t elite_count);
 	void CalculateFitness();
 	void CalculateTreeSize();
 	std::string ToString(size_t tree_index);
+	std::string BestTreeToString();
+	std::string AllTreesToString();
 
 	/* Population Data */
 	std::vector<Individual> pop_;

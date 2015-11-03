@@ -23,7 +23,6 @@
 #include "population.h"
 #include <iostream> /* For debugging/logging only */
 #include <random>
-//#include <string>
 
 Population::Population(size_t population_size, double mutation_rate,
 	double nonterminal_crossover_rate, size_t tournament_size,
@@ -61,6 +60,11 @@ Population::Population(size_t population_size, double mutation_rate,
 	CalculateFitness();
 	CalculateTreeSize();
 }
+std::string Population::ToString() {
+	return BestTreeToString();
+}
+
+/* Genetic Program Functions */
 void Population::RampedHalfAndHalf(size_t population_size, 
 	size_t depth_min, size_t depth_max) {
 	unsigned gradations = static_cast<unsigned>(depth_max - depth_min + 1);
@@ -76,6 +80,14 @@ void Population::RampedHalfAndHalf(size_t population_size,
 			(depth_min + i % gradations), full_tree));
 	}
 }
+void Population::MutatePopulation() {
+	for (auto p : pop_) {
+		p.Mutate(mutation_rate_);
+	}
+}
+void Population::Crossover(Individual *father, Individual *mother) {
+
+}
 void Population::Evolve(size_t evolution_count, size_t elitism_count) {
 	for (size_t i = 0; i < evolution_count; ++i) {
 		std::vector<Individual> evolved_pop(pop_.size());
@@ -88,7 +100,7 @@ void Population::Evolve(size_t evolution_count, size_t elitism_count) {
 			size_t parent1 = SelectIndividual();
 			size_t parent2 = SelectIndividual();
 
-			Crossover(&pop_[parent1], &pop_[parent2]);
+			//Crossover(&pop_[parent1], &pop_[parent2]);
 			pop_[parent1].Mutate(mutation_rate_);
 			pop_[parent2].Mutate(mutation_rate_);
 
@@ -100,11 +112,8 @@ void Population::Evolve(size_t evolution_count, size_t elitism_count) {
 		CalculateTreeSize();
 	}
 }
-void Population::MutatePopulation() {
-	for (auto p : pop_) {
-		p.Mutate(mutation_rate_);
-	}
-}
+
+/* Helper Functions */
 size_t Population::SelectIndividual() {
 	size_t winner;
 	size_t challenger;
@@ -123,13 +132,30 @@ size_t Population::SelectIndividual() {
 	}
 	return winner;
 }
+std::vector<size_t> Population::Elitism(size_t elitism_count) {
+	/*
+	* This functions returns a vector of the indices of the
+	* "elite_count" most fit individuals in the population.
+	* Currently, the elitism is forced at two individuals until I complete
+	* a sorting algorithm.
+	*/
 
-void Population::Crossover(Node *father, Node *mother) {
-	/* Randomly select a subtree from father and mother */
-	/* Attach mother subtree to father subtree at father's crossover point */
-	Node *offspring = new Node;
-	offspring->Copy(father);
+	size_t best, second;
+	best = 0;
+	second = 0;
 
+	if (elitism_count % 2 != 0) {
+		++elitism_count; /* Force elites to be even */
+	}
+
+	for (size_t i = 1; i < pop_.size(); ++i) {
+		if (pop_[i].GetFitness() < pop_[best].GetFitness()) {
+			best = i;
+		} else if (pop_[i].GetFitness() < pop_[second].GetFitness()) {
+			second = i;
+		}
+	}
+	return std::vector<size_t>{best, second};
 }
 void Population::CalculateFitness() {
 	double cur_fitness = 0;
@@ -161,30 +187,8 @@ void Population::CalculateTreeSize() {
 	total_nodes_ = avg_tree_;
 	avg_tree_ = avg_tree_ / pop_.size(); /* Will truncate, I don't care */
 }
-std::vector<size_t> Population::Elitism(size_t elitism_count) {
-	/* 
-	 * This functions returns a vector of the indices of the 
-	 * "elite_count" most fit individuals in the population.
-	 * Currently, the elitism is forced at two individuals until I complete
-	 * a sorting algorithm.
-	 */
-
-	size_t best, second;
-	best = 0;
-	second = 0;
-
-	if (elitism_count % 2 != 0) {
-		++elitism_count; /* Force elites to be even */
-	}
-
-	for (size_t i = 1; i < pop_.size(); ++i) {
-		if (pop_[i].GetFitness() < pop_[best].GetFitness()) {
-			best = i;
-		} else if (pop_[i].GetFitness() < pop_[second].GetFitness()) {
-			second = i;
-		}
-	}
-	return std::vector<size_t>{best, second};
+std::string Population::ToString(size_t tree_index) {
+	return pop_[tree_index].ToString();
 }
 std::string Population::BestTreeToString() {
 	return ToString(Elitism(2)[0]);
@@ -196,9 +200,8 @@ std::string Population::AllTreesToString() {
 	}
 	return all_trees;
 }
-std::string Population::ToString(size_t tree_index) {
-	return pop_[tree_index].ToString();
-}
+
+/* Private Accessor Functions */
 size_t Population::GetLargestTreeSize() {
 	return largest_tree_;
 }
@@ -219,11 +222,4 @@ double Population::GetWorstFitness() {
 }
 double Population::GetAverageFitness() {
 	return avg_fitness_;
-}
-void Population::RunPrivateTestFunctions() {
-	/* 
-	 * This function is just to provide access to private functions
-	 * from the main driver function while working different components
-	 * of the project.
-	 */
 }

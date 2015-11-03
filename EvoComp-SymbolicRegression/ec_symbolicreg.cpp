@@ -117,7 +117,7 @@ void PrintPopulationFitnessSummary(Population p) {
 	std::clog << "Best: " << p.GetBestFitness() << std::endl;
 	std::clog << "Worst: " << p.GetWorstFitness() << std::endl;
 	std::clog << "Average: " << p.GetAverageFitness() << std::endl;
-	std::clog << "Best Solution: " << p.BestTreeToString() << std::endl;
+	std::clog << "Best Solution: " << p.ToString() << std::endl;
 	std::clog << std::endl;
 }
 void PrintPopulationTreeSizeSummary(Population p) {

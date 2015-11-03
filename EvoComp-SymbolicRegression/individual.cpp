@@ -30,7 +30,6 @@ Individual::Individual(size_t var_count, double const_min, double const_max) {
 	root_->SetVarCount(var_count);
 	root_->SetConstMin(const_min);
 	root_->SetConstMax(const_max);
-	root_->SetChildNumber(0);
 }
 Individual::Individual() : Individual(0, 0, 0) {}
 Individual::Individual(size_t var_count, double const_min, double const_max,
@@ -41,6 +40,15 @@ Individual::Individual(size_t var_count, double const_min, double const_max,
 void Individual::Erase() {
 	root_->Erase();
 	delete root_;
+}
+std::string Individual::ToString() {
+	return root_->ToString();
+}
+
+/* Genetic Program Functions */
+void Individual::GenerateTree(size_t depth_max, bool full_tree) {
+	root_->GenerateTree(0, depth_max, nullptr, full_tree);
+	CalculateTreeSize();
 }
 void Individual::Mutate(double mutation_rate) {
 	root_->Mutate(mutation_rate);
@@ -72,28 +80,26 @@ std::pair<Node*, size_t> Individual::GetRandomNode(bool nonterminal) {
 	return root_->SelectNode(countdown, nonterminal);
 	
 }
+
+/* Helper Functions */
 void Individual::CalculateTreeSize() {
 	terminal_count_ = 0;
 	nonterminal_count_ = 0;
 	root_->CountAndCorrectNodes(terminal_count_, nonterminal_count_);
 }
-void Individual::SetRootNode(Node *root) {
-	root_ = root;
-}
 void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
 	fitness_ = 0.0f;
 	for (size_t i = 0; i < solutions.size(); ++i) {
-		fitness_ += pow(solutions[i].y - root_->Evaluate(solutions[i].x),2);
+		fitness_ += pow(solutions[i].y - root_->Evaluate(solutions[i].x), 2);
 	}
 	fitness_ = sqrt(fitness_ / solutions.size());
 }
-void Individual::GenerateTree(size_t depth_max, bool full_tree) {
-	root_->GenerateTree(0, depth_max, nullptr, full_tree);
-	CalculateTreeSize();
+std::pair<Node*, size_t> Node::SelectNode(size_t countdown, bool nonterminal) {
+	/* TODO (Chris): Determine if function is necessary and finish. */
+	return std::pair<Node*, size_t>(nullptr, 0);
 }
-std::string Individual::ToString() {
-	return root_->ToString();
-}
+
+/* Private Accessors/Mutators */
 double Individual::GetFitness() {
 	return fitness_;
 }
@@ -105,4 +111,7 @@ size_t Individual::GetTerminalCount() {
 }
 size_t Individual::GetNonTerminalCount() {
 	return nonterminal_count_;
+}
+void Individual::SetRootNode(Node *root) {
+	root_ = root;
 }

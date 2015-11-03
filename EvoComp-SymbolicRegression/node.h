@@ -30,34 +30,40 @@ class Node {
 public:
 	void Copy(Node *to_copy);
 	void Erase();
+	std::string ToString();
+
 	void GenerateTree(size_t cur_depth, size_t max_depth,
 		Node *parent, bool full_tree);
-	double Evaluate(std::vector<double> var_values);
 	void Mutate(double mutation_chance);
-	std::string ToString();
+	double Evaluate(std::vector<double> var_values);
 	std::pair<Node*,size_t> SelectNode(size_t countdown, bool nonterminal);
-	size_t GetChildCount();
-	void CountAndCorrectNodes(size_t &term, size_t &nonterm);
+
+	/* Public Helper Functions */
+	void CountAndCorrectNodes(size_t &term_count, size_t &nonterm_count);
+	bool IsTerminal();
+	bool IsNonTerminal();
+
+	/* Private Accessors/Mutators */
 	Node* GetParent();
-	Node* GetChild(size_t child_number);
-	void SetChild(size_t child_num, Node *child);
-	void SetChildNumber(size_t child_number);
+	Node* GetLeftChild();
+	Node* GetRightChild();
 	void SetParent(Node *parent);
+	void SetLeftChild(Node *child);
+	void SetRightChild(Node *child);
 	void SetVarCount(size_t var_count);
 	void SetConstMin(double const_min);
 	void SetConstMax(double const_max);
-	bool IsTerminal();
-	bool IsNonTerminal();
-	
 private:
-	/* Helper Functions */
+	/* Private Helper Functions */
 	double GenerateConstantValue();
 	size_t GenerateVariableIndex();
 	
 
 	/* Tree Structure */
 	Node *parent_;
-	std::vector<Node*> children_;
+	Node *left_;
+	Node *right_;
+	//std::vector<Node*> children_;
 
 	/* Node Data */
 	OpType op_;
