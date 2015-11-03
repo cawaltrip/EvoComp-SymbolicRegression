@@ -35,17 +35,25 @@ public:
 	double Evaluate(std::vector<double> var_values);
 	void Mutate(double mutation_chance);
 	std::string ToString();
-	void CountNodes(size_t &term, size_t &nonterm);
+	std::pair<Node*,size_t> SelectNode(size_t countdown, bool nonterminal);
+	size_t GetChildCount();
+	void CountAndCorrectNodes(size_t &term, size_t &nonterm);
+	Node* GetParent();
+	Node* GetChild(size_t child_number);
+	void SetChild(size_t child_num, Node *child);
+	void SetChildNumber(size_t child_number);
 	void SetParent(Node *parent);
 	void SetVarCount(size_t var_count);
 	void SetConstMin(double const_min);
 	void SetConstMax(double const_max);
-private:
-	/* Helper Functions */
 	bool IsTerminal();
 	bool IsNonTerminal();
+	
+private:
+	/* Helper Functions */
 	double GenerateConstantValue();
 	size_t GenerateVariableIndex();
+	
 
 	/* Tree Structure */
 	Node *parent_;
@@ -55,6 +63,7 @@ private:
 	OpType op_;
 	size_t var_index_;
 	double const_val_;
+	size_t child_number_;
 
 	/* Node Metadata */
 	size_t var_count_;

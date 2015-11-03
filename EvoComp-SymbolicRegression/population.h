@@ -27,10 +27,10 @@
 
 class Population {
 public:
-	Population(size_t population_size, double mutation_rate, 
-		size_t tournament_size, size_t depth_min, size_t depth_max, 
-		double const_min, double const_max, size_t var_count, 
-		std::vector<SolutionData> solutions);
+	Population(size_t population_size, double mutation_rate,
+		double nonterminal_crossover_rate, size_t tournament_size, 
+		size_t depth_min, size_t depth_max, double const_min, double const_max,
+		size_t var_count, std::vector<SolutionData> solutions);
 
 	void RunPrivateTestFunctions();
 	std::string BestTreeToString();
@@ -52,7 +52,8 @@ private:
 		size_t depth_min, size_t depth_max);
 	size_t SelectIndividual();
 	void MutatePopulation();
-	void Crossover(Individual *parent1, Individual *parent2);
+	void Crossover(Individual *father, Individual *mother);
+	void Crossover(Node *father, Node *mother);
 	std::vector<size_t> Elitism(size_t elite_count);
 	void CalculateFitness();
 	void CalculateTreeSize();
@@ -65,6 +66,7 @@ private:
 	double const_max_;
 	size_t var_count_;
 	double mutation_rate_;
+	double nonterminal_crossover_rate_;
 	size_t tournament_size_;
 
 	/* Population Metadata */

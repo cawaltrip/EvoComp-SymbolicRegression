@@ -26,13 +26,14 @@
 //#include <string>
 
 Population::Population(size_t population_size, double mutation_rate,
-	size_t tournament_size, size_t depth_min, size_t depth_max,
-	double const_min, double const_max, size_t var_count,
-	std::vector<SolutionData> solutions) {
+	double nonterminal_crossover_rate, size_t tournament_size,
+	size_t depth_min, size_t depth_max, double const_min, double const_max,
+	size_t var_count, std::vector<SolutionData> solutions) {
 
 	solutions_ = solutions;
 
 	mutation_rate_ = mutation_rate;
+	nonterminal_crossover_rate_ = nonterminal_crossover_rate;
 	tournament_size_ = tournament_size;
 
 	var_count_ = var_count;
@@ -82,6 +83,7 @@ void Population::Evolve(size_t evolution_count, size_t elitism_count) {
 		for (size_t j = 0; j < elitism_count; ++j) {
 			evolved_pop[j] = pop_[elites[j]];
 		}
+		/* TODO (Chris): This should only generate one offspring at a time */
 		for (size_t j = elitism_count; j < pop_.size(); j += 2) {
 			size_t parent1 = SelectIndividual();
 			size_t parent2 = SelectIndividual();
@@ -121,8 +123,13 @@ size_t Population::SelectIndividual() {
 	}
 	return winner;
 }
-void Population::Crossover(Individual *parent1, Individual *parent2) {
-	/* TODO (Chris): Finish stub */
+
+void Population::Crossover(Node *father, Node *mother) {
+	/* Randomly select a subtree from father and mother */
+	/* Attach mother subtree to father subtree at father's crossover point */
+	Node *offspring = new Node;
+	offspring->Copy(father);
+
 }
 void Population::CalculateFitness() {
 	double cur_fitness = 0;
@@ -136,7 +143,6 @@ void Population::CalculateFitness() {
 		} else if (cur_fitness > worst_fitness_) {
 			worst_fitness_ = cur_fitness;
 		}
-		//std::clog << "Current Fitness: " << cur_fitness << "\n";
 	}
 	avg_fitness_ = avg_fitness_ / pop_.size();
 }
@@ -144,7 +150,6 @@ void Population::CalculateTreeSize() {
 	size_t cur_tree = 0;
 	avg_tree_ = 0;
 	for (auto p : pop_) {
-		p.CalculateTreeSize();
 		cur_tree = p.GetTreeSize();
 		avg_tree_ += cur_tree;
 		if (cur_tree > largest_tree_) {

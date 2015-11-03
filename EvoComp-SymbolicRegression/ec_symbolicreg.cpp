@@ -40,8 +40,9 @@ int main() {
 	const size_t kElitismCount = 2;
 
 	/* Population Constants */
-	const size_t kPopulationSize = 30;
+	const size_t kPopulationSize = 5;
 	const double kMutationRate = 0.03;
+	const double kNonTerminalCrossoverRate = 0.90; /* 90/10 Rule */
 	const size_t kTournamentSize = 3;
 
 	/* Individual/Node Constants */
@@ -53,8 +54,8 @@ int main() {
 	/* File Parsing */
 	std::vector<SolutionData> solutions(ParseInput(kFilename));
 	size_t var_count = solutions[0].x.size() - 1;
-	Population p(kPopulationSize, kMutationRate, kTournamentSize, 
-		kTreeDepthMin, kTreeDepthMax, kConstMin, kConstMax, 
+	Population p(kPopulationSize, kMutationRate, kNonTerminalCrossoverRate,
+		kTournamentSize, kTreeDepthMin, kTreeDepthMax, kConstMin, kConstMax, 
 		var_count, solutions);
 
 	/* Genetic Program Work */

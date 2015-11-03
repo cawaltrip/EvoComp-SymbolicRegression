@@ -40,9 +40,12 @@ public:
 	std::string ToString();
 	void Mutate(double mutation_rate);
 
+	std::pair<Node*,size_t> GetRandomNode(bool nonterminal);
+
 	void CalculateTreeSize();
 	void CalculateFitness(std::vector<SolutionData> input_values);
 	void GenerateTree(size_t depth_max, bool full_tree);
+	void SetRootNode(Node *root);
 
 	double GetFitness();
 	size_t GetTreeSize();
@@ -54,4 +57,7 @@ private:
 	size_t terminal_count_;
 	size_t nonterminal_count_;
 	size_t depth_max_;
+
+	/* Helper Functions */
+	std::pair<Node*, size_t> SelectNode(size_t countdown, bool nonterminal);
 };

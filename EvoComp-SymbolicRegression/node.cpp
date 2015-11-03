@@ -21,6 +21,7 @@
 * along with EC-SymbolicReg.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "node.h"
+#include <deque>
 #include <iostream> /* Only for errors */
 #include <random>
 #include <string> /* For std::to_string */
@@ -46,6 +47,9 @@ void Node::Copy(Node *to_copy) {
 			}
 		}
 	}
+}
+void Node::SetChildNumber(size_t child_number) {
+	child_number_ = child_number;
 }
 void Node::Erase() {
 	for (auto &child : children_) {
@@ -166,10 +170,20 @@ std::string Node::ToString() {
 		break;
 	}
 }
-void Node::CountNodes(size_t &term, size_t &nonterm) {
-	for (auto n : children_) {
-		if (n != nullptr) {
-			n->CountNodes(term, nonterm);
+size_t Node::GetChildCount() {
+	return children_.size();
+}
+Node* Node::GetChild(size_t child_number) {
+	if (child_number < children_.size()) {
+		return children_[child_number];
+	}
+	return nullptr;
+}
+void Node::CountAndCorrectNodes(size_t &term, size_t &nonterm) {
+	for (size_t i = 0; i < children_.size(); ++i) {
+		if (children_[i] != nullptr) {
+			children_[i]->child_number_ = i;
+			children_[i]->CountAndCorrectNodes(term, nonterm);
 		}
 	}
 	switch (op_) {
@@ -228,6 +242,16 @@ double Node::Evaluate(std::vector<double> var_values) {
 	}
 	return fitness;
 }
+Node* Node::GetParent() {
+	return parent_;
+}
+void Node::SetChild(size_t child_num, Node *child) {
+	if (child_num < children_.size()) {
+		children_[child_num] = child;
+	} else {
+		std::cerr << "Couldn't assign child to node!" << std::endl;
+	}
+}
 void Node::SetParent(Node *parent) {
 	parent_ = parent;
 }
@@ -262,4 +286,42 @@ size_t Node::GenerateVariableIndex() {
 
 	std::uniform_int_distribution<size_t> v{ 0,var_count_ };
 	return v(mt);
+}
+std::pair<Node*, size_t> Node::SelectNode(size_t countdown, bool nonterminal) {
+	std::deque<Node*> traversal_stack;
+	bool done = false;
+	Node *current = this;
+	size_t original_countdown = countdown;
+	
+	while (!done) {
+		if (nonterminal == current->IsNonTerminal()) {
+			if (countdown <= 0) {
+				/* Found our node */
+				done = true;
+				break;
+			} else {
+				--countdown;
+			}
+		}
+		for (auto c : current->children_) {
+			traversal_stack.push_front(c);
+		}
+		if (!traversal_stack.empty()) {
+			current = traversal_stack.front();
+			traversal_stack.pop_front();
+		} else {
+			std::cerr << "Invalid search of node!" << std::endl;
+			std::cerr << "Original Countdown: " << original_countdown << std::endl;
+			std::cerr << "Current Countdown: " << countdown << std::endl;
+			std::cerr << "`this` node solution: " << this->ToString() << std::endl;
+			std::cerr << "Current node information: " << std::endl;
+			std::cerr << "`current` node solution: " << current->ToString() << std::endl;
+			std::cerr << "Parent address: " << current->parent_ << std::endl;
+			std::cerr << "Children size: " << current->children_.size() << std::endl;
+			std::cerr << "Current operator: " << current->op_ << std::endl;
+			std::cerr << "Child number: " << current->child_number_ << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+	return std::pair<Node*, size_t>(current, current->child_number_);
 }
