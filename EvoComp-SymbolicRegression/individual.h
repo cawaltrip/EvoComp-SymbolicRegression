@@ -34,13 +34,15 @@ public:
 	Individual(size_t var_count, double const_min, double const_max);
 	Individual(size_t var_count, double const_min, double const_max,
 		size_t depth_max, bool full_tree);
+	Individual(const Individual &to_copy);
 	void Erase();
 	std::string ToString();
 	
 	/* Genetic Program Functions */
 	void GenerateTree(size_t depth_max, bool full_tree);
 	void Mutate(double mutation_rate);
-	std::pair<Node*, size_t> GetRandomNode(bool nonterminal);
+	std::pair<Node*, bool> GetCrossoverParent(bool nonterminal);
+	Node* GetCrossoverNode(bool nonterminal);
 	
 	/* Public Helper Functions */
 	void CalculateTreeSize();
@@ -57,8 +59,10 @@ private:
 	double fitness_;
 	size_t terminal_count_;
 	size_t nonterminal_count_;
-	size_t depth_max_;
 
-	/* Helper Functions */
-	std::pair<Node*, size_t> SelectNode(size_t countdown, bool nonterminal);
+	
+	//size_t depth_max_;
+
+	/* Private Helper Functions */
+	std::pair<Node*, bool> GetRandomNode(bool nonterminal);
 };

@@ -115,11 +115,12 @@ void Node::GenerateTree(size_t cur_depth, size_t max_depth,
 	case kDiv:
 		for (size_t i = 0; i < 2; ++i) {
 			Node *child = new Node;
+			//child->parent_ = this;
 			child->var_count_ = this->var_count_;
 			child->const_min_ = this->const_min_;
 			child->const_max_ = this->const_max_;
 			child->GenerateTree(cur_depth + 1, max_depth, this, full_tree);
-			if (i) {
+			if (!i) {
 				left_ = child;
 			} else {
 				right_ = child;
@@ -197,17 +198,64 @@ double Node::Evaluate(std::vector<double> var_values) {
 		break;
 	}
 }
+std::pair<Node*, bool> Node::SelectNode(size_t countdown, bool nonterminal) {
+	std::deque<std::pair<Node*, bool>> stack;
+	std::pair<Node*, bool> current;
+	bool done = false;
+
+	if (countdown == 0) {
+		std::cerr << "Somehow passed 0 to SelectNode!" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	if (right_) {
+		stack.push_front(std::make_pair(right_, false));
+	}
+	if (left_) {
+		stack.push_front(std::make_pair(left_, true));
+	}
+
+	while (!done) {
+		if (stack.empty()) {
+			std::cerr << "Empty stack!" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		if (countdown == SIZE_MAX) {
+			std::cerr << "Countdown wrapped around!" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		current = stack.front();
+		stack.pop_front();
+		if (countdown == 0 && nonterminal == current.first->IsNonTerminal()) {
+			/* Found the node that we want. */
+			done = true;
+			return current;
+			break;
+		}
+		if (nonterminal == current.first->IsNonTerminal()) {
+			--countdown;
+		}
+		
+		if (current.first->right_) {
+			stack.push_front(std::make_pair(current.first->right_, false));
+		}
+		if (current.first->left_) {
+			stack.push_front(std::make_pair(current.first->left_, true));
+		}
+	}
+	return current;
+}
 
 /* Helper Functions */
-void Node::CountAndCorrectNodes(size_t &term_count, size_t &nonterm_count) {
+void Node::CountNodes(size_t &term_count, size_t &nonterm_count) {
 	switch (op_) {
 	case kAdd:
 	case kSub:
 	case kMult:
 	case kDiv:
 		++nonterm_count;
-		left_->CountAndCorrectNodes(term_count, nonterm_count);
-		right_->CountAndCorrectNodes(term_count, nonterm_count);
+		left_->CountNodes(term_count, nonterm_count);
+		right_->CountNodes(term_count, nonterm_count);
 		break;
 	case kConst:
 	case kVar:
@@ -257,9 +305,15 @@ void Node::SetParent(Node *parent) {
 	parent_ = parent;
 }
 void Node::SetLeftChild(Node *child) {
+	if (!left_) {
+		left_ = new Node;
+	}
 	left_ = child;
 }
 void Node::SetRightChild(Node *child) {
+	if (!right_) {
+		right_ = new Node;
+	}
 	right_ = child;
 }
 void Node::SetVarCount(size_t var_count) {

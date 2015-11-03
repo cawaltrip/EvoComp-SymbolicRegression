@@ -36,10 +36,10 @@ public:
 		Node *parent, bool full_tree);
 	void Mutate(double mutation_chance);
 	double Evaluate(std::vector<double> var_values);
-	std::pair<Node*,size_t> SelectNode(size_t countdown, bool nonterminal);
+	std::pair<Node*,bool> SelectNode(size_t countdown, bool nonterminal);
 
 	/* Public Helper Functions */
-	void CountAndCorrectNodes(size_t &term_count, size_t &nonterm_count);
+	void CountNodes(size_t &term_count, size_t &nonterm_count);
 	bool IsTerminal();
 	bool IsNonTerminal();
 
@@ -57,19 +57,16 @@ private:
 	/* Private Helper Functions */
 	double GenerateConstantValue();
 	size_t GenerateVariableIndex();
-	
 
 	/* Tree Structure */
 	Node *parent_;
 	Node *left_;
 	Node *right_;
-	//std::vector<Node*> children_;
 
 	/* Node Data */
 	OpType op_;
 	size_t var_index_;
 	double const_val_;
-	size_t child_number_;
 
 	/* Node Metadata */
 	size_t var_count_;

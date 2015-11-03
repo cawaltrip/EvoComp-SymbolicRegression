@@ -37,6 +37,13 @@ Individual::Individual(size_t var_count, double const_min, double const_max,
 	: Individual(var_count, const_min, const_max) {
 	this->GenerateTree(depth_max, full_tree);
 }
+Individual::Individual(const Individual &to_copy) {
+	root_ = new Node;
+	root_->Copy(to_copy.root_);
+	fitness_ = to_copy.fitness_;
+	terminal_count_ = to_copy.terminal_count_;
+	nonterminal_count_ = to_copy.nonterminal_count_;
+}
 void Individual::Erase() {
 	root_->Erase();
 	delete root_;
@@ -53,39 +60,43 @@ void Individual::GenerateTree(size_t depth_max, bool full_tree) {
 void Individual::Mutate(double mutation_rate) {
 	root_->Mutate(mutation_rate);
 }
-std::pair<Node*, size_t> Individual::GetRandomNode(bool nonterminal) {
+std::pair<Node*, bool> Individual::GetRandomNode(bool nonterminal) {
+	/* Returned bool is true for left child and false for right child. */
+	/* Can return nullptr, which means that entire tree will be replaced. */
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	size_t upper_bound;
-	if (nonterminal && !nonterminal_count_) {
-		nonterminal = false;
+	size_t countdown;
+
+	/* It should be correct to return root here */
+	if (nonterminal_count_ == 0) {
+		return std::pair<Node*, bool>(root_, nonterminal);
 	}
+
 	if (nonterminal) {
 		upper_bound = nonterminal_count_ - 1;
 	} else {
 		upper_bound = terminal_count_ - 1;
 	}
 	std::uniform_int_distribution<size_t> d{ 0,upper_bound };
-	size_t countdown = d(mt);
-	
-	/* 
-	std::pair<Node*, size_t> node_pair;
-	if ((nonterminal && !nonterminal_count_) || (!nonterminal && terminal_count_) ) {
-		node_pair = std::make_pair(root_, 0);
-	} else {
-		node_pair = root_->SelectNode(countdown, nonterminal);
-	}
-	return node_pair;
-	*/
+	countdown = d(mt);
+
 	return root_->SelectNode(countdown, nonterminal);
-	
+}
+std::pair<Node*, bool> Individual::GetCrossoverParent(bool nonterminal) {
+	std::pair<Node*, bool> node_pair = GetRandomNode(nonterminal);
+	node_pair.first = node_pair.first->GetParent();
+	return node_pair;
+}
+Node* Individual::GetCrossoverNode(bool nonterminal) {
+	return GetRandomNode(nonterminal).first;
 }
 
 /* Helper Functions */
 void Individual::CalculateTreeSize() {
 	terminal_count_ = 0;
 	nonterminal_count_ = 0;
-	root_->CountAndCorrectNodes(terminal_count_, nonterminal_count_);
+	root_->CountNodes(terminal_count_, nonterminal_count_);
 }
 void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
 	fitness_ = 0.0f;
@@ -93,10 +104,6 @@ void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
 		fitness_ += pow(solutions[i].y - root_->Evaluate(solutions[i].x), 2);
 	}
 	fitness_ = sqrt(fitness_ / solutions.size());
-}
-std::pair<Node*, size_t> Node::SelectNode(size_t countdown, bool nonterminal) {
-	/* TODO (Chris): Determine if function is necessary and finish. */
-	return std::pair<Node*, size_t>(nullptr, 0);
 }
 
 /* Private Accessors/Mutators */
@@ -113,5 +120,8 @@ size_t Individual::GetNonTerminalCount() {
 	return nonterminal_count_;
 }
 void Individual::SetRootNode(Node *root) {
+	if (!root_) {
+		root_ = new Node;
+	}
 	root_ = root;
 }

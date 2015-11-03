@@ -85,8 +85,41 @@ void Population::MutatePopulation() {
 		p.Mutate(mutation_rate_);
 	}
 }
-void Population::Crossover(Individual *father, Individual *mother) {
+Individual Population::Crossover(Individual *father, Individual *mother) {
+	/* Get crossover points.  Crossover point of father is the parent
+	 * and identifier of whether left or right child.  Crossover point of 
+	 * mother is the node to splice in.
+	 */
+	Individual p1(*father);
+	Individual p2(*mother);
+	Individual child;
 
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_real_distribution<double> d{ 0,1 };
+
+	bool p1_nonterminal = (d(mt) < nonterminal_crossover_rate_);
+	bool p2_nonterminal = (d(mt) < nonterminal_crossover_rate_);
+	
+	std::pair<Node*, bool> c1 = p1.GetCrossoverParent(p1_nonterminal);
+	Node* c2 = p2.GetCrossoverNode(p2_nonterminal);
+
+	/* c1.first could be nullptr in which case new individual is c2 */
+	if (!c1.first) {
+		c2->SetParent(nullptr);
+		p1.Erase();
+		p1.SetRootNode(c2);
+	} else {
+		c2->SetParent(c1.first);
+		if (c1.second) {
+			c1.first->GetLeftChild()->Erase();
+			c1.first->SetLeftChild(c2);
+		} else {
+			c1.first->GetRightChild()->Erase();
+			c1.first->SetRightChild(c2);
+		}
+	}
+	return p1;
 }
 void Population::Evolve(size_t evolution_count, size_t elitism_count) {
 	for (size_t i = 0; i < evolution_count; ++i) {
@@ -95,17 +128,11 @@ void Population::Evolve(size_t evolution_count, size_t elitism_count) {
 		for (size_t j = 0; j < elitism_count; ++j) {
 			evolved_pop[j] = pop_[elites[j]];
 		}
-		/* TODO (Chris): This should only generate one offspring at a time */
-		for (size_t j = elitism_count; j < pop_.size(); j += 2) {
+		for (size_t j = elitism_count; j < pop_.size(); ++j) {
 			size_t parent1 = SelectIndividual();
 			size_t parent2 = SelectIndividual();
-
-			//Crossover(&pop_[parent1], &pop_[parent2]);
-			pop_[parent1].Mutate(mutation_rate_);
-			pop_[parent2].Mutate(mutation_rate_);
-
-			evolved_pop[j] = pop_[parent1];
-			evolved_pop[j + 1] = pop_[parent2];
+			evolved_pop[j] = Crossover(&pop_[parent1], &pop_[parent2]);
+			evolved_pop[j].Mutate(mutation_rate_);
 		}
 		pop_ = evolved_pop;
 		CalculateFitness();

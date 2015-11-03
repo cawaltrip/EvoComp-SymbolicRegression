@@ -61,7 +61,7 @@ int main() {
 	/* Genetic Program Work */
 	PrintPopulationFitnessSummary(p);
 
-	for (size_t i = 0; i < 20; i++) {
+	for (size_t i = 0; i < 5; i++) {
 		p.Evolve(kEvolutionCount, kElitismCount);
 		PrintPopulationFitnessSummary(p);
 	}

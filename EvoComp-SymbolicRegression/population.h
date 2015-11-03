@@ -49,7 +49,7 @@ private:
 	void RampedHalfAndHalf(size_t population_size,
 						   size_t depth_min, size_t depth_max);
 	void MutatePopulation();
-	void Crossover(Individual *father, Individual *mother);
+	Individual Crossover(Individual *father, Individual *mother);
 
 	/* Helper functions */
 	size_t SelectIndividual();
