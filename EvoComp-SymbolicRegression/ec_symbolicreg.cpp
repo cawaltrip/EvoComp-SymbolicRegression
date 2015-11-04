@@ -32,22 +32,23 @@
 std::vector<SolutionData> ParseInput(std::string filename);
 void PrintPopulationFitnessSummary(Population p);
 void PrintPopulationTreeSizeSummary(Population p);
+void PrintPopulation(Population p);
 
 int main() {
 	/* Genetic Program Constants */
 	const std::string kFilename = "GPProjectEasyData.csv";
-	const size_t kEvolutionCount = 1;
+	const size_t kEvolutionCount = 5;
 	const size_t kElitismCount = 2;
 
 	/* Population Constants */
-	const size_t kPopulationSize = 5;
+	const size_t kPopulationSize = 10;
 	const double kMutationRate = 0.03;
 	const double kNonTerminalCrossoverRate = 0.90; /* 90/10 Rule */
 	const size_t kTournamentSize = 3;
 
 	/* Individual/Node Constants */
-	const size_t kTreeDepthMin = 3;
-	const size_t kTreeDepthMax = 6;
+	const size_t kTreeDepthMin = 2;
+	const size_t kTreeDepthMax = 2;
 	const double kConstMin = -10.0f;
 	const double kConstMax = 10.0f;
 	
@@ -65,6 +66,9 @@ int main() {
 		p.Evolve(kEvolutionCount, kElitismCount);
 		PrintPopulationFitnessSummary(p);
 	}
+	
+	PrintPopulation(p);
+
 	
 	return 0;
 }
@@ -117,7 +121,7 @@ void PrintPopulationFitnessSummary(Population p) {
 	std::clog << "Best: " << p.GetBestFitness() << std::endl;
 	std::clog << "Worst: " << p.GetWorstFitness() << std::endl;
 	std::clog << "Average: " << p.GetAverageFitness() << std::endl;
-	std::clog << "Best Solution: " << p.ToString() << std::endl;
+	std::clog << "Best Solution: " << p.BestTreeToString() << std::endl;
 	std::clog << std::endl;
 }
 void PrintPopulationTreeSizeSummary(Population p) {
@@ -126,4 +130,12 @@ void PrintPopulationTreeSizeSummary(Population p) {
 	std::clog << "Smallest: " << p.GetSmallestTreeSize() << std::endl;
 	std::clog << "Average: " << p.GetAverageTreeSize() << std::endl;
 	std::clog << "Total Node Count: " << p.GetTotalNodeCount() << std::endl;
+}
+void PrintPopulation(Population p) {
+	std::clog << std::endl;
+	std::clog << "=======================================" << std::endl;
+	//std::clog << p.AllTreesToString();
+	p.AllTreesToString();
+	std::clog << "=======================================" << std::endl;
+	std::clog << std::endl;
 }

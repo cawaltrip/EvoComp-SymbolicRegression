@@ -32,6 +32,8 @@ public:
 		size_t depth_min, size_t depth_max, double const_min, double const_max,
 		size_t var_count, std::vector<SolutionData> solutions);
 	std::string ToString();
+	std::string BestTreeToString();
+	std::string AllTreesToString();
 	
 	/* Public Genetic Program Functions */
 	void Evolve(size_t evolution_count = 1, size_t elitism_count = 2);
@@ -49,7 +51,7 @@ private:
 	void RampedHalfAndHalf(size_t population_size,
 						   size_t depth_min, size_t depth_max);
 	void MutatePopulation();
-	Individual Crossover(Individual *father, Individual *mother);
+	void Crossover(Individual *father, Individual *mother);
 
 	/* Helper functions */
 	size_t SelectIndividual();
@@ -57,8 +59,6 @@ private:
 	void CalculateFitness();
 	void CalculateTreeSize();
 	std::string ToString(size_t tree_index);
-	std::string BestTreeToString();
-	std::string AllTreesToString();
 
 	/* Population Data */
 	std::vector<Individual> pop_;

@@ -23,6 +23,7 @@
 #include "population.h"
 #include <iostream> /* For debugging/logging only */
 #include <random>
+#include <sstream>
 
 Population::Population(size_t population_size, double mutation_rate,
 	double nonterminal_crossover_rate, size_t tournament_size,
@@ -85,15 +86,12 @@ void Population::MutatePopulation() {
 		p.Mutate(mutation_rate_);
 	}
 }
-Individual Population::Crossover(Individual *father, Individual *mother) {
+void Population::Crossover(Individual *father, Individual *mother) {
 	/* Get crossover points.  Crossover point of father is the parent
 	 * and identifier of whether left or right child.  Crossover point of 
 	 * mother is the node to splice in.
 	 */
-	Individual p1(*father);
-	Individual p2(*mother);
-	Individual child;
-
+	
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::uniform_real_distribution<double> d{ 0,1 };
@@ -101,27 +99,29 @@ Individual Population::Crossover(Individual *father, Individual *mother) {
 	bool p1_nonterminal = (d(mt) < nonterminal_crossover_rate_);
 	bool p2_nonterminal = (d(mt) < nonterminal_crossover_rate_);
 	
-	std::pair<Node*, bool> c1 = p1.GetCrossoverParent(p1_nonterminal);
-	Node* c2 = p2.GetCrossoverNode(p2_nonterminal);
+	std::pair<Node*, bool> c1 = father->GetRandomNode(p1_nonterminal);
+	std::pair<Node*, bool> c2 = mother->GetRandomNode(p2_nonterminal);
 
 	/* c1.first could be nullptr in which case new individual is c2 */
-	if (!c1.first) {
-		c2->SetParent(nullptr);
-		p1.Erase();
-		p1.SetRootNode(c2);
+	if (!c1.first->GetParent()) {
+		c2.first->SetParent(nullptr);
+		father->Erase();
+		father->SetRootNode(c2.first);
 	} else {
-		c2->SetParent(c1.first);
+		Node *parent = c1.first->GetParent();
+		c2.first->SetParent(parent);
 		if (c1.second) {
-			c1.first->GetLeftChild()->Erase();
-			c1.first->SetLeftChild(c2);
+			parent->GetLeftChild()->Erase();
+			parent->SetLeftChild(c2.first);
 		} else {
-			c1.first->GetRightChild()->Erase();
-			c1.first->SetRightChild(c2);
+			parent->GetRightChild()->Erase();
+			parent->SetRightChild(c2.first);
 		}
 	}
-	return p1;
+	father->CorrectTree();
 }
 void Population::Evolve(size_t evolution_count, size_t elitism_count) {
+
 	for (size_t i = 0; i < evolution_count; ++i) {
 		std::vector<Individual> evolved_pop(pop_.size());
 		std::vector<size_t> elites = Elitism(elitism_count);
@@ -130,8 +130,15 @@ void Population::Evolve(size_t evolution_count, size_t elitism_count) {
 		}
 		for (size_t j = elitism_count; j < pop_.size(); ++j) {
 			size_t parent1 = SelectIndividual();
-			size_t parent2 = SelectIndividual();
-			evolved_pop[j] = Crossover(&pop_[parent1], &pop_[parent2]);
+			size_t parent2;
+			do {
+				 parent2 = SelectIndividual();
+			} while (parent2 == parent1);
+			
+			Individual father(pop_[parent1]);
+			Individual mother(pop_[parent2]);
+			Crossover(&father, &mother);
+			evolved_pop[j] = father;
 			evolved_pop[j].Mutate(mutation_rate_);
 		}
 		pop_ = evolved_pop;
@@ -221,11 +228,11 @@ std::string Population::BestTreeToString() {
 	return ToString(Elitism(2)[0]);
 }
 std::string Population::AllTreesToString() {
-	std::string all_trees = "";
 	for (auto p : pop_) {
-		all_trees += p.ToString() + "\n";
+		p.CalculateFitness(solutions_);
+		std::clog << p.GetFitness() << " ==> " << p.ToString() << "\n";
 	}
-	return all_trees;
+	return "";
 }
 
 /* Private Accessor Functions */

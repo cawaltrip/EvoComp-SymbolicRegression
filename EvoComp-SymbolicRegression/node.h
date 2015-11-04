@@ -42,6 +42,7 @@ public:
 	void CountNodes(size_t &term_count, size_t &nonterm_count);
 	bool IsTerminal();
 	bool IsNonTerminal();
+	void CorrectParents(Node *parent);
 
 	/* Private Accessors/Mutators */
 	Node* GetParent();

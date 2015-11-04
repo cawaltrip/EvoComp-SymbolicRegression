@@ -28,6 +28,7 @@
 #include "operator_types.h"
 
 void Node::Copy(Node *to_copy) {
+	parent_ = to_copy->parent_;
 	op_ = to_copy->op_;
 	var_count_ = to_copy->var_count_;
 	const_min_ = to_copy->const_min_;
@@ -36,8 +37,12 @@ void Node::Copy(Node *to_copy) {
 	switch (op_) {
 	case kConst:
 		const_val_ = to_copy->const_val_;
+		left_ = nullptr;
+		right_ = nullptr;
 		break;
 	case kVar:
+		left_ = nullptr;
+		right_ = nullptr;
 		var_index_ = to_copy->var_index_;
 		break;
 	default:
@@ -115,23 +120,26 @@ void Node::GenerateTree(size_t cur_depth, size_t max_depth,
 	case kDiv:
 		for (size_t i = 0; i < 2; ++i) {
 			Node *child = new Node;
-			//child->parent_ = this;
-			child->var_count_ = this->var_count_;
-			child->const_min_ = this->const_min_;
-			child->const_max_ = this->const_max_;
-			child->GenerateTree(cur_depth + 1, max_depth, this, full_tree);
 			if (!i) {
 				left_ = child;
 			} else {
 				right_ = child;
 			}
+			child->var_count_ = this->var_count_;
+			child->const_min_ = this->const_min_;
+			child->const_max_ = this->const_max_;
+			child->GenerateTree(cur_depth + 1, max_depth, this, full_tree);
 		}
 		break;
 	case kConst:
 		const_val_ = GenerateConstantValue();
+		left_ = nullptr;
+		right_ = nullptr;
 		break;
 	case kVar:
 		var_index_ = GenerateVariableIndex();
+		left_ = nullptr;
+		right_ = nullptr;
 		break;
 	default:
 		/* Shouldn't get here */
@@ -203,17 +211,7 @@ std::pair<Node*, bool> Node::SelectNode(size_t countdown, bool nonterminal) {
 	std::pair<Node*, bool> current;
 	bool done = false;
 
-	if (countdown == 0) {
-		std::cerr << "Somehow passed 0 to SelectNode!" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-	if (right_) {
-		stack.push_front(std::make_pair(right_, false));
-	}
-	if (left_) {
-		stack.push_front(std::make_pair(left_, true));
-	}
+	stack.push_front(std::make_pair(this, true));
 
 	while (!done) {
 		if (stack.empty()) {
@@ -289,6 +287,13 @@ bool Node::IsNonTerminal() {
 }
 bool Node::IsTerminal() {
 	return !IsNonTerminal();
+}
+void Node::CorrectParents(Node *parent) {
+	this->parent_ = parent;
+	if (IsNonTerminal()) {
+		this->left_->CorrectParents(this);
+		this->right_->CorrectParents(this);
+	}
 }
 
 /* Private Accessors/Mutators */

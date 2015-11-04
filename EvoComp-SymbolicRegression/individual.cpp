@@ -23,7 +23,9 @@
 */
 #include "individual.h"
 #include <deque>
+#include <iostream>
 #include <random>
+#include <string>
 
 Individual::Individual(size_t var_count, double const_min, double const_max) {
 	root_ = new Node;
@@ -43,10 +45,17 @@ Individual::Individual(const Individual &to_copy) {
 	fitness_ = to_copy.fitness_;
 	terminal_count_ = to_copy.terminal_count_;
 	nonterminal_count_ = to_copy.nonterminal_count_;
+
+	CorrectTree();
+}
+void Individual::Copy(Individual *to_copy) {
+	root_ = to_copy->root_;
+	fitness_ = to_copy->fitness_;
+	terminal_count_ = to_copy->terminal_count_;
+	nonterminal_count_ = to_copy->nonterminal_count_;
 }
 void Individual::Erase() {
 	root_->Erase();
-	delete root_;
 }
 std::string Individual::ToString() {
 	return root_->ToString();
@@ -56,6 +65,7 @@ std::string Individual::ToString() {
 void Individual::GenerateTree(size_t depth_max, bool full_tree) {
 	root_->GenerateTree(0, depth_max, nullptr, full_tree);
 	CalculateTreeSize();
+	std::clog << root_->ToString() << std::endl;
 }
 void Individual::Mutate(double mutation_rate) {
 	root_->Mutate(mutation_rate);
@@ -68,7 +78,7 @@ std::pair<Node*, bool> Individual::GetRandomNode(bool nonterminal) {
 	size_t upper_bound;
 	size_t countdown;
 
-	/* It should be correct to return root here */
+	/* Even if nonterminal is true, return root node if it's the only node */
 	if (nonterminal_count_ == 0) {
 		return std::pair<Node*, bool>(root_, nonterminal);
 	}
@@ -83,14 +93,6 @@ std::pair<Node*, bool> Individual::GetRandomNode(bool nonterminal) {
 
 	return root_->SelectNode(countdown, nonterminal);
 }
-std::pair<Node*, bool> Individual::GetCrossoverParent(bool nonterminal) {
-	std::pair<Node*, bool> node_pair = GetRandomNode(nonterminal);
-	node_pair.first = node_pair.first->GetParent();
-	return node_pair;
-}
-Node* Individual::GetCrossoverNode(bool nonterminal) {
-	return GetRandomNode(nonterminal).first;
-}
 
 /* Helper Functions */
 void Individual::CalculateTreeSize() {
@@ -99,11 +101,15 @@ void Individual::CalculateTreeSize() {
 	root_->CountNodes(terminal_count_, nonterminal_count_);
 }
 void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
-	fitness_ = 0.0f;
+	fitness_ = 0.0;
 	for (size_t i = 0; i < solutions.size(); ++i) {
 		fitness_ += pow(solutions[i].y - root_->Evaluate(solutions[i].x), 2);
 	}
-	fitness_ = sqrt(fitness_ / solutions.size());
+	fitness_ = sqrt(fitness_);
+}
+void Individual::CorrectTree() {
+	root_->CorrectParents(nullptr);
+	CalculateTreeSize();
 }
 
 /* Private Accessors/Mutators */
@@ -119,9 +125,9 @@ size_t Individual::GetTerminalCount() {
 size_t Individual::GetNonTerminalCount() {
 	return nonterminal_count_;
 }
+Node* Individual::GetRootNode() {
+	return root_;
+}
 void Individual::SetRootNode(Node *root) {
-	if (!root_) {
-		root_ = new Node;
-	}
 	root_ = root;
 }
