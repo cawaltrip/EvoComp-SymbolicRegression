@@ -61,9 +61,6 @@ Population::Population(size_t population_size, double mutation_rate,
 	CalculateFitness();
 	CalculateTreeSize();
 }
-std::string Population::ToString() {
-	return BestTreeToString();
-}
 
 /* Genetic Program Functions */
 void Population::RampedHalfAndHalf(size_t population_size, 
@@ -82,14 +79,14 @@ void Population::RampedHalfAndHalf(size_t population_size,
 	}
 }
 void Population::MutatePopulation() {
-	for (auto p : pop_) {
+	for (auto &p : pop_) {
 		p.Mutate(mutation_rate_);
 	}
 }
-void Population::Crossover(Individual *father, Individual *mother) {
-	/* Get crossover points.  Crossover point of father is the parent
+void Population::Crossover(Individual *parent1, Individual *parent2) {
+	/* Get crossover points.  Crossover point of parent1 is the parent
 	 * and identifier of whether left or right child.  Crossover point of 
-	 * mother is the node to splice in.
+	 * parent2 is the node to splice in.
 	 */
 	
 	std::random_device rd;
@@ -99,14 +96,14 @@ void Population::Crossover(Individual *father, Individual *mother) {
 	bool p1_nonterminal = (d(mt) < nonterminal_crossover_rate_);
 	bool p2_nonterminal = (d(mt) < nonterminal_crossover_rate_);
 	
-	std::pair<Node*, bool> c1 = father->GetRandomNode(p1_nonterminal);
-	std::pair<Node*, bool> c2 = mother->GetRandomNode(p2_nonterminal);
+	std::pair<Node*, bool> c1 = parent1->GetRandomNode(p1_nonterminal);
+	std::pair<Node*, bool> c2 = parent2->GetRandomNode(p2_nonterminal);
 
 	/* c1.first could be nullptr in which case new individual is c2 */
 	if (!c1.first->GetParent()) {
 		c2.first->SetParent(nullptr);
-		father->Erase();
-		father->SetRootNode(c2.first);
+		parent1->Erase();
+		parent1->SetRootNode(c2.first);
 	} else {
 		Node *parent = c1.first->GetParent();
 		c2.first->SetParent(parent);
@@ -118,10 +115,9 @@ void Population::Crossover(Individual *father, Individual *mother) {
 			parent->SetRightChild(c2.first);
 		}
 	}
-	father->CorrectTree();
+	parent1->CorrectTree();
 }
 void Population::Evolve(size_t evolution_count, size_t elitism_count) {
-
 	for (size_t i = 0; i < evolution_count; ++i) {
 		std::vector<Individual> evolved_pop(pop_.size());
 		std::vector<size_t> elites = Elitism(elitism_count);
@@ -129,19 +125,19 @@ void Population::Evolve(size_t evolution_count, size_t elitism_count) {
 			evolved_pop[j] = pop_[elites[j]];
 		}
 		for (size_t j = elitism_count; j < pop_.size(); ++j) {
-			size_t parent1 = SelectIndividual();
-			size_t parent2;
+			size_t p1 = SelectIndividual();
+			size_t p2;
 			do {
-				 parent2 = SelectIndividual();
-			} while (parent2 == parent1);
+				 p2 = SelectIndividual();
+			} while (p2 == p1);
 			
-			Individual father(pop_[parent1]);
-			Individual mother(pop_[parent2]);
-			Crossover(&father, &mother);
-			evolved_pop[j] = father;
+			Individual parent1(pop_[p1]);
+			Individual parent2(pop_[p2]);
+			Crossover(&parent1, &parent2);
+			evolved_pop[j] = parent1;
 			evolved_pop[j].Mutate(mutation_rate_);
 		}
-		pop_ = evolved_pop;
+		this->pop_ = evolved_pop;
 		CalculateFitness();
 		CalculateTreeSize();
 	}
@@ -194,7 +190,9 @@ std::vector<size_t> Population::Elitism(size_t elitism_count) {
 void Population::CalculateFitness() {
 	double cur_fitness = 0;
 	avg_fitness_ = 0;
-	for (auto p : pop_) {
+	best_fitness_ = DBL_MAX;
+	worst_fitness_ = DBL_MIN;
+	for (auto &p : pop_) {
 		p.CalculateFitness(solutions_);
 		cur_fitness = p.GetFitness();
 		avg_fitness_ += cur_fitness;
@@ -221,18 +219,16 @@ void Population::CalculateTreeSize() {
 	total_nodes_ = avg_tree_;
 	avg_tree_ = avg_tree_ / pop_.size(); /* Will truncate, I don't care */
 }
-std::string Population::ToString(size_t tree_index) {
-	return pop_[tree_index].ToString();
-}
-std::string Population::BestTreeToString() {
-	return ToString(Elitism(2)[0]);
-}
-std::string Population::AllTreesToString() {
-	for (auto p : pop_) {
-		p.CalculateFitness(solutions_);
-		std::clog << p.GetFitness() << " ==> " << p.ToString() << "\n";
+std::string Population::ToString(bool include_fitness) {
+	std::stringstream ss;
+	for (auto &p : pop_) {
+		if (include_fitness) {
+			p.CalculateFitness(solutions_);
+			ss << p.GetFitness() << " ==> ";
+		}
+		ss << p.ToString() << "\n";
 	}
-	return "";
+	return ss.str();
 }
 
 /* Private Accessor Functions */

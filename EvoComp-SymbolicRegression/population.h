@@ -31,9 +31,7 @@ public:
 		double nonterminal_crossover_rate, size_t tournament_size, 
 		size_t depth_min, size_t depth_max, double const_min, double const_max,
 		size_t var_count, std::vector<SolutionData> solutions);
-	std::string ToString();
-	std::string BestTreeToString();
-	std::string AllTreesToString();
+	std::string ToString(bool include_fitness = false);
 	
 	/* Public Genetic Program Functions */
 	void Evolve(size_t evolution_count = 1, size_t elitism_count = 2);
@@ -51,14 +49,13 @@ private:
 	void RampedHalfAndHalf(size_t population_size,
 						   size_t depth_min, size_t depth_max);
 	void MutatePopulation();
-	void Crossover(Individual *father, Individual *mother);
+	void Crossover(Individual *parent1, Individual *parent2);
 
 	/* Helper functions */
 	size_t SelectIndividual();
 	std::vector<size_t> Elitism(size_t elite_count);
 	void CalculateFitness();
 	void CalculateTreeSize();
-	std::string ToString(size_t tree_index);
 
 	/* Population Data */
 	std::vector<Individual> pop_;

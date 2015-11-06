@@ -30,14 +30,11 @@
 #include "solution_data.h"
 
 std::vector<SolutionData> ParseInput(std::string filename);
-void PrintPopulationFitnessSummary(Population p);
-void PrintPopulationTreeSizeSummary(Population p);
-void PrintPopulation(Population p);
 
 int main() {
 	/* Genetic Program Constants */
 	const std::string kFilename = "GPProjectEasyData.csv";
-	const size_t kEvolutionCount = 5;
+	const size_t kEvolutionCount = 10;
 	const size_t kElitismCount = 2;
 
 	/* Population Constants */
@@ -60,16 +57,12 @@ int main() {
 		var_count, solutions);
 
 	/* Genetic Program Work */
-	PrintPopulationFitnessSummary(p);
-
-	for (size_t i = 0; i < 5; i++) {
+	for (size_t i = 0; i < 20; ++i) {
 		p.Evolve(kEvolutionCount, kElitismCount);
-		PrintPopulationFitnessSummary(p);
 	}
 	
-	PrintPopulation(p);
-
 	
+	std::clog << p.ToString(true) << std::endl;
 	return 0;
 }
 std::vector<SolutionData> ParseInput(std::string filename) {
@@ -115,27 +108,4 @@ std::vector<SolutionData> ParseInput(std::string filename) {
 	solutions.shrink_to_fit();
 	inf.close();
 	return solutions;
-}
-void PrintPopulationFitnessSummary(Population p) {
-	std::clog << "Fitness: " << std::endl;
-	std::clog << "Best: " << p.GetBestFitness() << std::endl;
-	std::clog << "Worst: " << p.GetWorstFitness() << std::endl;
-	std::clog << "Average: " << p.GetAverageFitness() << std::endl;
-	std::clog << "Best Solution: " << p.BestTreeToString() << std::endl;
-	std::clog << std::endl;
-}
-void PrintPopulationTreeSizeSummary(Population p) {
-	std::clog << "Tree Size: " << std::endl;
-	std::clog << "Largest: " << p.GetLargestTreeSize() << std::endl;
-	std::clog << "Smallest: " << p.GetSmallestTreeSize() << std::endl;
-	std::clog << "Average: " << p.GetAverageTreeSize() << std::endl;
-	std::clog << "Total Node Count: " << p.GetTotalNodeCount() << std::endl;
-}
-void PrintPopulation(Population p) {
-	std::clog << std::endl;
-	std::clog << "=======================================" << std::endl;
-	//std::clog << p.AllTreesToString();
-	p.AllTreesToString();
-	std::clog << "=======================================" << std::endl;
-	std::clog << std::endl;
 }
