@@ -28,13 +28,18 @@
 class Population {
 public:
 	Population(size_t population_size, double mutation_rate,
-		double nonterminal_crossover_rate, size_t tournament_size, 
-		size_t depth_min, size_t depth_max, double const_min, double const_max,
-		size_t var_count, std::vector<SolutionData> solutions);
-	std::string ToString(bool include_fitness = false);
+			   double nonterminal_crossover_rate, size_t tournament_size, 
+			   size_t depth_min, size_t depth_max,
+			   double const_min, double const_max, 
+			   size_t var_count, std::vector<SolutionData> solutions);
 	
+	/* Helper Functions */
+	std::string ToString(bool include_fitness = false);
+	std::string GetBestSolutionToString(bool include_fitness = false);
+	std::string GetBestWeightedSolutionToString(bool include_fitness = false);
+
 	/* Public Genetic Program Functions */
-	void Evolve(size_t evolution_count = 1, size_t elitism_count = 2);
+	void Evolve(size_t elitism_count = 2);
 	
 	/* Private Accessor Functions */
 	size_t GetLargestTreeSize();
@@ -44,6 +49,9 @@ public:
 	double GetBestFitness();
 	double GetWorstFitness();
 	double GetAverageFitness();
+	double GetBestWeightedFitness();
+	double GetWorstWeightedFitness();
+	double GetAverageWeightedFitness();
 private:
 	/* Private Genetic Program Functions */
 	void RampedHalfAndHalf(size_t population_size,
@@ -55,6 +63,9 @@ private:
 	size_t SelectIndividual();
 	std::vector<size_t> Elitism(size_t elite_count);
 	void CalculateFitness();
+	void CalculateRawFitness();
+	void CalculateWeightedFitness();
+	double CalculateParsimonyCoefficient();
 	void CalculateTreeSize();
 
 	/* Population Data */
@@ -72,7 +83,12 @@ private:
 	size_t smallest_tree_;
 	size_t avg_tree_;
 	size_t total_nodes_;
+	size_t best_index_;
+	size_t best_weighted_index_;
 	double best_fitness_;
 	double worst_fitness_;
 	double avg_fitness_;
+	double best_weighted_fitness_;
+	double worst_weighted_fitness_;
+	double avg_weighted_fitness_;
 };

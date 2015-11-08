@@ -30,38 +30,53 @@
 #include "solution_data.h"
 
 std::vector<SolutionData> ParseInput(std::string filename);
+std::string GetOutputDataString(size_t evolution_count, Population &p);
 
 int main() {
 	/* Genetic Program Constants */
-	const std::string kFilename = "GPProjectEasyData.csv";
-	const size_t kEvolutionCount = 10;
+	const std::string kInputFilename = "GPProjectData.csv";
+	const std::string kOutputFilename = "GPSymbolicRegression_Output.txt";
+	const size_t kEvolutionCount = 200;
 	const size_t kElitismCount = 2;
 
 	/* Population Constants */
-	const size_t kPopulationSize = 10;
+	const size_t kPopulationSize = 100;
 	const double kMutationRate = 0.03;
 	const double kNonTerminalCrossoverRate = 0.90; /* 90/10 Rule */
 	const size_t kTournamentSize = 3;
 
 	/* Individual/Node Constants */
-	const size_t kTreeDepthMin = 2;
-	const size_t kTreeDepthMax = 2;
+	const size_t kTreeDepthMin = 3;
+	const size_t kTreeDepthMax = 6;
 	const double kConstMin = -10.0f;
 	const double kConstMax = 10.0f;
 	
 	/* File Parsing */
-	std::vector<SolutionData> solutions(ParseInput(kFilename));
+	std::vector<SolutionData> solutions(ParseInput(kInputFilename));
 	size_t var_count = solutions[0].x.size() - 1;
 	Population p(kPopulationSize, kMutationRate, kNonTerminalCrossoverRate,
-		kTournamentSize, kTreeDepthMin, kTreeDepthMax, kConstMin, kConstMax, 
-		var_count, solutions);
+				 kTournamentSize, kTreeDepthMin, kTreeDepthMax,
+				 kConstMin, kConstMax, var_count, solutions);
+
+	/* Output File */
+	std::ofstream output_file;
+	output_file.open(kOutputFilename, std::ios::out | std::ios::trunc);
 
 	/* Genetic Program Work */
-	for (size_t i = 0; i < 20; ++i) {
-		p.Evolve(kEvolutionCount, kElitismCount);
+	for (size_t i = 0; i < kEvolutionCount; ++i) {
+		output_file << GetOutputDataString(i, p) << "\n";
+		std::clog << "Evolution Counter: " << i << "\n";
+		std::clog << p.GetBestSolutionToString(true) << "\n";
+		std::clog << p.GetBestWeightedSolutionToString(true) << "\n";
+		std::clog << "*****************************************************\n";
+		p.Evolve(kElitismCount);
 	}
-	
-	
+	output_file << GetOutputDataString(kEvolutionCount, p) << "\n";
+	output_file.close();
+	std::clog << "Evolution Counter: " << kEvolutionCount << "\n";
+	std::clog << p.GetBestSolutionToString(true) << "\n";
+	std::clog << p.GetBestWeightedSolutionToString(true) << "\n";
+	std::clog << "*****************************************************\n";
 	std::clog << p.ToString(true) << std::endl;
 	return 0;
 }
@@ -108,4 +123,23 @@ std::vector<SolutionData> ParseInput(std::string filename) {
 	solutions.shrink_to_fit();
 	inf.close();
 	return solutions;
+}
+std::string GetOutputDataString(size_t evolution_count, Population &p) {
+	std::stringstream ss;
+	char delim = ',';
+	
+	ss << evolution_count << delim;
+	ss << p.GetBestFitness() << delim;
+	ss << p.GetWorstFitness() << delim;
+	ss << p.GetAverageFitness() << delim;
+	ss << p.GetBestWeightedFitness() << delim;
+	ss << p.GetWorstWeightedFitness() << delim;
+	ss << p.GetAverageWeightedFitness() << delim;
+	ss << p.GetSmallestTreeSize() << delim;
+	ss << p.GetLargestTreeSize() << delim;
+	ss << p.GetAverageTreeSize() << delim;
+	ss << p.GetBestSolutionToString() << delim;
+	ss << p.GetBestWeightedSolutionToString();
+
+	return ss.str();
 }

@@ -48,10 +48,12 @@ public:
 	/* Public Helper Functions */
 	void CalculateTreeSize();
 	void CalculateFitness(std::vector<SolutionData> input_values);
+	void CalculateWeightedFitness(double parsimony_coefficient);
 	void CorrectTree();
 
 	/* Private Accessors/Mutators */
 	double GetFitness();
+	double GetWeightedFitness();
 	size_t GetTreeSize();
 	size_t GetTerminalCount();
 	size_t GetNonTerminalCount();
@@ -60,6 +62,7 @@ public:
 private:
 	Node *root_;
 	double fitness_;
+	double weighted_fitness_;
 	size_t terminal_count_;
 	size_t nonterminal_count_;
 };

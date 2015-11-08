@@ -144,6 +144,7 @@ void Node::GenerateTree(size_t cur_depth, size_t max_depth,
 	default:
 		/* Shouldn't get here */
 		std::cerr << "Bad node type!" << std::endl;
+		exit(EXIT_FAILURE);
 		break;
 	}
 }

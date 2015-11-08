@@ -65,7 +65,6 @@ std::string Individual::ToString() {
 void Individual::GenerateTree(size_t depth_max, bool full_tree) {
 	root_->GenerateTree(0, depth_max, nullptr, full_tree);
 	CalculateTreeSize();
-	std::clog << root_->ToString() << std::endl;
 }
 void Individual::Mutate(double mutation_rate) {
 	root_->Mutate(mutation_rate);
@@ -107,14 +106,21 @@ void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
 	}
 	fitness_ = sqrt(fitness_);
 }
+void Individual::CalculateWeightedFitness(double parsimony_coefficient) {
+	weighted_fitness_ = fitness_ + parsimony_coefficient * GetTreeSize();
+}
 void Individual::CorrectTree() {
 	root_->CorrectParents(nullptr);
 	CalculateTreeSize();
 }
 
+
 /* Private Accessors/Mutators */
 double Individual::GetFitness() {
 	return fitness_;
+}
+double Individual::GetWeightedFitness() {
+	return weighted_fitness_;
 }
 size_t Individual::GetTreeSize() {
 	return this->GetTerminalCount() + this->GetNonTerminalCount();
