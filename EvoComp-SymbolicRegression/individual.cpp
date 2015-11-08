@@ -104,7 +104,7 @@ void Individual::CalculateFitness(std::vector<SolutionData> solutions) {
 	for (size_t i = 0; i < solutions.size(); ++i) {
 		fitness_ += pow(solutions[i].y - root_->Evaluate(solutions[i].x), 2);
 	}
-	fitness_ = sqrt(fitness_);
+	fitness_ = sqrt(fitness_ / solutions.size());
 }
 void Individual::CalculateWeightedFitness(double parsimony_coefficient) {
 	weighted_fitness_ = fitness_ + parsimony_coefficient * GetTreeSize();

@@ -35,15 +35,15 @@ std::string GetOutputDataString(size_t evolution_count, Population &p);
 int main() {
 	/* Genetic Program Constants */
 	const std::string kInputFilename = "GPProjectData.csv";
-	const std::string kOutputFilename = "GPSymbolicRegression_Output.txt";
-	const size_t kEvolutionCount = 200;
+	const std::string kOutputFilename = "GPOutput_Run1_NoMutation_TS7.csv";
+	const size_t kEvolutionCount = 1000;
 	const size_t kElitismCount = 2;
 
 	/* Population Constants */
 	const size_t kPopulationSize = 100;
 	const double kMutationRate = 0.03;
 	const double kNonTerminalCrossoverRate = 0.90; /* 90/10 Rule */
-	const size_t kTournamentSize = 3;
+	const size_t kTournamentSize = 7;
 
 	/* Individual/Node Constants */
 	const size_t kTreeDepthMin = 3;
@@ -64,20 +64,10 @@ int main() {
 
 	/* Genetic Program Work */
 	for (size_t i = 0; i < kEvolutionCount; ++i) {
-		output_file << GetOutputDataString(i, p) << "\n";
-		std::clog << "Evolution Counter: " << i << "\n";
-		std::clog << p.GetBestSolutionToString(true) << "\n";
-		std::clog << p.GetBestWeightedSolutionToString(true) << "\n";
-		std::clog << "*****************************************************\n";
 		p.Evolve(kElitismCount);
+		output_file << GetOutputDataString(i + 1, p) << "\n";
 	}
-	output_file << GetOutputDataString(kEvolutionCount, p) << "\n";
 	output_file.close();
-	std::clog << "Evolution Counter: " << kEvolutionCount << "\n";
-	std::clog << p.GetBestSolutionToString(true) << "\n";
-	std::clog << p.GetBestWeightedSolutionToString(true) << "\n";
-	std::clog << "*****************************************************\n";
-	std::clog << p.ToString(true) << std::endl;
 	return 0;
 }
 std::vector<SolutionData> ParseInput(std::string filename) {

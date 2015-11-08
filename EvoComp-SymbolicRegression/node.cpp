@@ -152,6 +152,8 @@ void Node::Mutate(double mutation_chance) {
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::uniform_real_distribution<double> mut_dist{ 0,1 };
+	
+	
 	if (mut_dist(mt) <= mutation_chance) {
 		OpType lower_bound, upper_bound;
 		if (IsTerminal()) {
@@ -162,13 +164,18 @@ void Node::Mutate(double mutation_chance) {
 			upper_bound = kDiv;
 		}
 		std::uniform_int_distribution<int> d{ lower_bound, upper_bound };
+		OpType temp = op_; /* Only change if other terminal type chosen */
 		op_ = static_cast<OpType>(d(mt));
 		switch (op_) {
 		case kConst:
-			const_val_ = GenerateConstantValue();
+			if (temp == kVar) {
+				const_val_ = GenerateConstantValue();
+			}
 			break;
 		case kVar:
-			var_index_ = GenerateVariableIndex();
+			if (temp == kConst) {
+				var_index_ = GenerateVariableIndex();
+			}
 		}
 	}
 	if (IsNonTerminal()) {
