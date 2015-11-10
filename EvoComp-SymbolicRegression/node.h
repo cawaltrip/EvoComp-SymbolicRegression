@@ -30,7 +30,7 @@ class Node {
 public:
 	void Copy(Node *to_copy);
 	void Erase();
-	std::string ToString();
+	std::string ToString(bool latex = false);
 
 	void GenerateTree(size_t cur_depth, size_t max_depth,
 		Node *parent, bool full_tree);

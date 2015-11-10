@@ -292,26 +292,28 @@ std::string Population::ToString(bool include_fitness) {
 		if (include_fitness) {
 			ss << p.GetFitness() << " ==> ";
 		}
-		ss << p.ToString() << "\n";
+		ss << p.ToString(false) << "\n";
 	}
 	return ss.str();
 }
-std::string Population::GetBestSolutionToString(bool include_fitness) {
+std::string Population::GetBestSolutionToString(bool include_fitness,
+												bool latex) {
 	std::stringstream ss;
 
 	if (include_fitness) {
 		ss << pop_[best_index_].GetFitness() << " ==> ";
 	}
-	ss << pop_[best_index_].ToString();
+	ss << pop_[best_index_].ToString(latex);
 	return ss.str();
 }
-std::string Population::GetBestWeightedSolutionToString(bool include_fitness) {
+std::string Population::GetBestWeightedSolutionToString(bool include_fitness,
+														bool latex) {
 	std::stringstream ss;
 
 	if (include_fitness) {
 		ss << pop_[best_weighted_index_].GetWeightedFitness() << " ==> ";
 	}
-	ss << pop_[best_weighted_index_].ToString();
+	ss << pop_[best_weighted_index_].ToString(latex);
 	return ss.str();
 }
 

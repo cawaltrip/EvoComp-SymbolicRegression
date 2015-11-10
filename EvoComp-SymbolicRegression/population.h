@@ -35,8 +35,9 @@ public:
 	
 	/* Helper Functions */
 	std::string ToString(bool include_fitness = false);
-	std::string GetBestSolutionToString(bool include_fitness = false);
-	std::string GetBestWeightedSolutionToString(bool include_fitness = false);
+	std::string GetBestSolutionToString(bool include_fitness, bool latex);
+	std::string GetBestWeightedSolutionToString(bool include_fitness, 
+												bool latex);
 
 	/* Public Genetic Program Functions */
 	void Evolve(size_t elitism_count = 2);

@@ -57,8 +57,8 @@ void Individual::Copy(Individual *to_copy) {
 void Individual::Erase() {
 	root_->Erase();
 }
-std::string Individual::ToString() {
-	return root_->ToString();
+std::string Individual::ToString(bool latex) {
+	return root_->ToString(latex);
 }
 
 /* Genetic Program Functions */

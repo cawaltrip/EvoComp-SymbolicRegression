@@ -35,7 +35,7 @@ std::string GetOutputDataString(size_t evolution_count, Population &p);
 int main() {
 	/* Genetic Program Constants */
 	const std::string kInputFilename = "GPProjectData.csv";
-	const std::string kOutputFilename = "GPOutput_Run1_NoMutation_TS7.csv";
+	const std::string kOutputFilename = "GPOutput_Run9_LaTeX_TS7.csv";
 	const size_t kEvolutionCount = 1000;
 	const size_t kElitismCount = 2;
 
@@ -68,6 +68,7 @@ int main() {
 		output_file << GetOutputDataString(i + 1, p) << "\n";
 	}
 	output_file.close();
+	std::clog << "Best fitness: " << p.GetBestFitness() << std::endl;
 	return 0;
 }
 std::vector<SolutionData> ParseInput(std::string filename) {
@@ -122,14 +123,14 @@ std::string GetOutputDataString(size_t evolution_count, Population &p) {
 	ss << p.GetBestFitness() << delim;
 	ss << p.GetWorstFitness() << delim;
 	ss << p.GetAverageFitness() << delim;
-	ss << p.GetBestWeightedFitness() << delim;
-	ss << p.GetWorstWeightedFitness() << delim;
-	ss << p.GetAverageWeightedFitness() << delim;
+	//ss << p.GetBestWeightedFitness() << delim;
+	//ss << p.GetWorstWeightedFitness() << delim;
+	//ss << p.GetAverageWeightedFitness() << delim;
 	ss << p.GetSmallestTreeSize() << delim;
 	ss << p.GetLargestTreeSize() << delim;
 	ss << p.GetAverageTreeSize() << delim;
-	ss << p.GetBestSolutionToString() << delim;
-	ss << p.GetBestWeightedSolutionToString();
+	ss << p.GetBestSolutionToString(false,true);
+	//ss << p.GetBestWeightedSolutionToString(false,true);
 
 	return ss.str();
 }

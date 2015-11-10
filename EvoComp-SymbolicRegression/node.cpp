@@ -62,23 +62,26 @@ void Node::Erase() {
 	}
 	delete this;
 }
-std::string Node::ToString() {
+std::string Node::ToString(bool latex) {
 	switch (op_) {
 	case kAdd:
-		return ("(" + left_->ToString() +
-				" + " + right_->ToString() + ")");
+		return left_->ToString(latex) + " + " + right_->ToString(latex);
 		break;
 	case kSub:
-		return ("(" + left_->ToString() +
-				" - " + right_->ToString() + ")");
+		return left_->ToString(latex) + " - " + right_->ToString(latex);
 		break;
 	case kMult:
-		return ("(" + left_->ToString() +
-				" * " + right_->ToString() + ")");
+		return("(" + left_->ToString(latex) + 
+			   ")(" + right_->ToString(latex) + ")");
 		break;
 	case kDiv:
-		return ("(" + left_->ToString() +
-				" / " + right_->ToString() + ")");
+		if (latex) {
+			return("\\frac{" + left_->ToString(latex) +
+				   "}{" + right_->ToString(latex) + "}");
+		} else {
+			return ("(" + left_->ToString(latex) +
+					" / " + right_->ToString(latex) + ")");
+		}
 		break;
 	case kConst:
 		return std::to_string(const_val_);
@@ -164,18 +167,14 @@ void Node::Mutate(double mutation_chance) {
 			upper_bound = kDiv;
 		}
 		std::uniform_int_distribution<int> d{ lower_bound, upper_bound };
-		OpType temp = op_; /* Only change if other terminal type chosen */
+		
 		op_ = static_cast<OpType>(d(mt));
 		switch (op_) {
 		case kConst:
-			if (temp == kVar) {
-				const_val_ = GenerateConstantValue();
-			}
+			const_val_ = GenerateConstantValue();
 			break;
 		case kVar:
-			if (temp == kConst) {
-				var_index_ = GenerateVariableIndex();
-			}
+			var_index_ = GenerateVariableIndex();
 		}
 	}
 	if (IsNonTerminal()) {

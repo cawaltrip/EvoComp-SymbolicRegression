@@ -38,7 +38,7 @@ public:
 
 	void Copy(Individual *to_copy);
 	void Erase();
-	std::string ToString();
+	std::string ToString(bool latex);
 	
 	/* Genetic Program Functions */
 	void GenerateTree(size_t depth_max, bool full_tree);
